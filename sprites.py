@@ -24,8 +24,9 @@ class AgentSprite(pygame.sprite.Sprite):
                         (2, 2), #walk-6
                         (3, 0)] #walk-7
         self.walking_pointer = 0
-        self.idle = [(0,0), #idle-0
-                    (1,0)] #idle-1
+        # self.idle = [(0,0), #idle-0
+        #             (1,0)] #idle-1
+        self.idle = [(0,0)]
         self.idle_pointer = 0
 
         self.image = pygame.Surface([WIDTH * SCALE, HEIGHT * SCALE])

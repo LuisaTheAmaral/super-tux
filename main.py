@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 from agent import Agent
 from spritesheet import SpriteSheet
 from common import Directions
@@ -6,11 +6,17 @@ from sprites import AgentSprite
 
 BLACK = (0, 0, 0)
 
-def main(WIDTH, HEIGHT, SCALE=32):
+def main(WIDTH, HEIGHT, SCALE=20):
     pygame.init()
     command_log = []
     display = pygame.display.set_mode((SCALE * WIDTH, SCALE * HEIGHT))
     clock = pygame.time.Clock()
+
+    bg = pygame.image.load("assets/arctis.jpg").convert()
+    bg_width = bg.get_width()
+
+    scroll = 0
+    tiles= math.ceil(WIDTH / bg_width) + 1
 
     pygame.display.set_caption('Super Tux')
     sprite = SpriteSheet("sprites/spritesheet.png")
@@ -22,6 +28,10 @@ def main(WIDTH, HEIGHT, SCALE=32):
     all_sprites.add(agent_sprite)
 
     while True: # main game loop
+
+        for i in range( 0, tiles):
+            display.blit(bg, (i*bg_width+scroll,0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 agent.kill()
@@ -39,11 +49,13 @@ def main(WIDTH, HEIGHT, SCALE=32):
             if cmd:
                 command_log.append(cmd)
                 agent.move()
+                scroll += 1
         if keys[pygame.K_RIGHT]:
             cmd = agent.commands(pygame.K_RIGHT)
             if cmd:
                 command_log.append(cmd)
                 agent.move()
+                scroll -= 1
         if keys[pygame.K_DOWN]:
             cmd = agent.commands(pygame.K_DOWN)
             if cmd:
@@ -61,7 +73,7 @@ def main(WIDTH, HEIGHT, SCALE=32):
                 agent.move()
         
 
-        display.fill(BLACK)
+        #display.fill(BLACK)
         all_sprites.draw(display)
         pygame.display.flip()
         clock.tick(10)
@@ -69,4 +81,4 @@ def main(WIDTH, HEIGHT, SCALE=32):
             print(cmd)
 
 if __name__ == "__main__":
-    main(40, 20)
+    main(60, 30)
