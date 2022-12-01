@@ -29,6 +29,21 @@ class AgentSprite(pygame.sprite.Sprite):
         self.idle = [(0,0)]
         self.idle_pointer = 0
 
+        self.walking_r = [(2, 3), #walk-0 
+                        (0, 4), #walk-1 
+                        (1, 4), #walk-2
+                        (2, 4), #walk-3
+                        (0, 5), #walk-4
+                        (1, 5), #walk-5
+                        (2, 5), #walk-6
+                        (3, 3)] #walk-7
+        # self.idle = [(0,0), #idle-0
+        #             (1,0)] #idle-1
+        self.idle_r = [(0,3)]
+
+        self.change_dire = 0
+        self.prev_dir = Directions.RIGHT # starts facing right
+
         self.image = pygame.Surface([WIDTH * SCALE, HEIGHT * SCALE])
         self.update()
         self.rect = self.image.get_rect()
@@ -43,35 +58,42 @@ class AgentSprite(pygame.sprite.Sprite):
             """given 2 coordinates returns direction taken."""
             dir = None
             if x - prev_x > 0:
-                dir = Directions.RIGHT
+                return Directions.RIGHT, Directions.RIGHT
             elif x - prev_x < 0:
-                dir = Directions.LEFT
+                return Directions.LEFT, Directions.LEFT
             elif y - prev_y > 0:
                 dir = Directions.DOWN
             elif y - prev_y < 0:
                 dir = Directions.UP
-            return dir
+            return dir, self.prev_dir
 
         # Get body
         prev_x, prev_y = self.prev_body
         x, y = self.agent.body
 
-        dir = get_direction(x, y, prev_x, prev_y)
+        dir, dir_body = get_direction(x, y, prev_x, prev_y)
+
         if dir == None:
             #tux is idle
             self.walking_pointer = 0
-            frameX, frameY = self.idle[self.idle_pointer]
+            if dir_body == Directions.LEFT:
+                frameX, frameY = self.idle_r[self.idle_pointer]
+            else:
+                frameX, frameY = self.idle[self.idle_pointer]
             self.idle_pointer = (self.idle_pointer + 1) % len(self.idle)
         else:
             #tux is walking
             self.idle_pointer = 0
-            frameX, frameY = self.walking[self.walking_pointer]
+            if dir_body == Directions.LEFT:
+                frameX, frameY = self.walking_r[self.walking_pointer]
+            else:
+                frameX, frameY = self.walking[self.walking_pointer]
             self.walking_pointer = (self.walking_pointer + 1) % len(self.walking)
 
         self.image.blit(self.sheet, (self.SCALE * prev_x, self.SCALE * prev_y), ((frameX*CELL_SIZE), (frameY*CELL_SIZE), CELL_SIZE, CELL_SIZE ))
             
         self.prev_body = x, y
-        prev_dir = dir #not being used yet
+        self.prev_dir = dir_body #not being used yet
     
     
     
