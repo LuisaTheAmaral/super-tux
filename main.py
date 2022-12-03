@@ -46,6 +46,12 @@ def main(WIDTH, HEIGHT, SCALE=20):
                 if cmd:
                     command_log.append(cmd)
                     agent.move()
+                #if tux moved up then it has to come down (jump)
+                all_sprites.update()
+                cmd = agent.commands(pygame.K_DOWN)
+                if cmd:
+                    command_log.append(cmd)
+                    agent.move()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -71,12 +77,7 @@ def main(WIDTH, HEIGHT, SCALE=20):
         # Render sprites
         all_sprites.update()
         
-        #if tux moved up then it has to come down (jump)
-        if agent.direction == Directions.UP:
-            cmd = agent.commands(pygame.K_DOWN)
-            if cmd:
-                command_log.append(cmd)
-                agent.move()
+        
         
 
         #display.fill(BLACK)
