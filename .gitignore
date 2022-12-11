@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 sprites/official
+assets/media-master
+assets/media-master.zip

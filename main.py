@@ -1,10 +1,7 @@
 import pygame, math
 from agent import Agent
-from spritesheet import SpriteSheet
 from common import Directions
-from sprites import AgentSprite
-
-BLACK = (0, 0, 0)
+from sprites import AgentSprite, Platform
 
 def main(WIDTH, HEIGHT, SCALE=20):
     pygame.init()
@@ -18,17 +15,18 @@ def main(WIDTH, HEIGHT, SCALE=20):
     scroll = 0
     tiles= math.ceil(WIDTH / bg_width) + 1
 
-    pygame.display.set_caption('Super Tux')
-
-    #sprite = SpriteSheet("sprites/spritesheet.png")
-    sprite = SpriteSheet("sprites/spritesheet_full.png")
+    pygame.display.set_caption('Super Tux')    
 
     agent = Agent("Tux", WIDTH, HEIGHT)
-    agent_sprite = AgentSprite(agent, sprite.sheet, WIDTH, HEIGHT, SCALE)
     agent.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
 
+    platform_sprite = Platform(0, HEIGHT*SCALE - 30, WIDTH*SCALE, 32)
+    platforms = []
+    platforms.append(platform_sprite)
+    agent_sprite = AgentSprite(agent, WIDTH, HEIGHT, SCALE, platforms)
     all_sprites = pygame.sprite.Group()
     all_sprites.add(agent_sprite)
+    all_sprites.add(platform_sprite)
 
     while True: # main game loop
 
@@ -74,18 +72,13 @@ def main(WIDTH, HEIGHT, SCALE=20):
                 command_log.append(cmd)
                 agent.move()
 
-        # Render sprites
         all_sprites.update()
-        
-        
-        
-
-        #display.fill(BLACK)
         all_sprites.draw(display)
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(15)
         for cmd in command_log:
             print(cmd)
+            command_log.remove(cmd) #reduces cmd print spam
 
 if __name__ == "__main__":
     main(60, 30)
