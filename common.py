@@ -29,23 +29,36 @@ class Command:
 
 class Up(Command):
     def execute(self, actor):
-        self.actor = actor
-        actor.jump()
+        pass
+        # self.actor = actor
+        # actor.jump()
 
 class Left(Command):
-    def execute(self, actor):
-        self.actor = actor
-        actor.move(Directions.LEFT)
+    def __init__(self)->None:
+        self.dir = Directions.LEFT    #left
+        
+    # def execute(self, actor):
+    #     self.actor = actor
+    #     # actor.move(Directions.LEFT)
 
 class Down(Command):
     def execute(self, actor):
         #not used yet
-        self.actor = actor
-        actor.move(Directions.DOWN)
+        pass
+        # self.actor = actor
+        # actor.move(Directions.DOWN)
 
 class Right(Command):
+    def __init__(self)->None:
+        self.dir = Directions.RIGHT    #right
+        
     def execute(self, actor):
-        self.actor = actor
-        actor.move(Directions.RIGHT)
+        pass
+        # self.actor = actor
+        # actor.move(Directions.RIGHT)
+        
+class Stop(Command):
+    def __init__(self)->None:
+        self.dir = None    #right
     
 

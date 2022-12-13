@@ -132,10 +132,15 @@ def main(width, height, scale):
  
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.change_x < 0:
-                    player.stop()
+                    cmd = player.commands(None)
+                    if cmd:
+                        command_log.append(cmd)
+                    
                 if event.key == pygame.K_RIGHT and player.change_x > 0:
-                    player.stop()
- 
+                    cmd = player.commands(None)
+                    if cmd:
+                        command_log.append(cmd)
+                    
         # Update the player
         active_sprite_list.update()
  

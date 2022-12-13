@@ -2,9 +2,150 @@ import pygame
 from spritesheet import SpriteSheet
 from common import Directions, Up, Left, Down, Right, ALPHA
 import logging
+from fsm import FSM, State, Transition
+from enum import Enum
 
 # Global constants
 CELL_SIZE = 50
+
+# TUX STATES  
+class Event(Enum):
+    IDLE = 1,
+    WALK = 2,
+    JUMP = 3,
+    GROW = 4,
+    SHRINK = 5,
+    DIE = 6
+    
+class Idle(State):
+    def __init__(self) -> None:
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object, dir, previous):
+        object.stop()
+        
+    def get_xy(self, dir, walking_pointer):
+        walking_pointer = 0
+        if dir == Directions.LEFT:
+            frameX, frameY = (0, 3)
+        elif dir == Directions.RIGHT:
+            # idle sprite
+            frameX, frameY = (0, 0)
+        return frameX, frameY, walking_pointer
+
+class Walk(State):
+    WALKING =   [(2, 0), #walk-0
+                (0, 1), #walk-1 
+                (1, 1), #walk-2
+                (2, 1), #walk-3
+                (0, 2), #walk-4
+                (1, 2), #walk-5
+                (2, 2), #walk-6
+                (3, 0)] #walk-7
+    WALKING_R = [(2, 3), #walk-0 
+                (0, 4), #walk-1 
+                (1, 4), #walk-2
+                (2, 4), #walk-3
+                (0, 5), #walk-4
+                (1, 5), #walk-5
+                (2, 5), #walk-6
+                (3, 3)] #walk-7
+    def __init__(self) -> None:
+        print("new WALK")
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object, dir, previous):
+        
+        if dir==Directions.LEFT:
+            object.move(Directions.LEFT)
+        else:
+            object.move(Directions.RIGHT)
+            
+    def get_xy(self, dir, walking_pointer):
+        if dir == Directions.LEFT:
+            frameX, frameY = self.WALKING_R[walking_pointer]
+        elif dir == Directions.RIGHT:
+            frameX, frameY = self.WALKING[walking_pointer]
+        walking_pointer = (walking_pointer + 1) % len(self.WALKING)
+        print(walking_pointer)
+        return frameX, frameY, walking_pointer
+
+    
+class Jump(State):
+    def __init__(self) -> None:
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object, dir, previous):
+        
+        object.jump(previous)
+    
+    def get_xy(self, dir):
+        #tux is jumping
+        if dir == Directions.LEFT:
+            frameX, frameY = (3, 4)
+        if dir == Directions.RIGHT:
+            frameX, frameY = (3, 1)
+        return frameX, frameY
+    
+class Grow(State):
+    def __init__(self) -> None:
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object, dir):
+        #print("Tux Growing")
+        return super().update(object)
+    
+class Die(State):
+    def __init__(self) -> None:
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object,dir):
+        #print("Tux Growing")
+        return super().update(object)
+    
+class Shrink(State):
+    def __init__(self) -> None:
+        super().__init__(self.__class__.__name__)
+
+    def update(self, object):
+        #print("Tux Growing")
+        return super().update(object)
+    
+STATES_MINI = [Idle, Walk, Jump, Grow, Die]
+
+TRANSITIONS_MINI = {
+    Event.IDLE: [Transition(Walk, Idle), Transition(Jump, Idle)],
+    Event.WALK: [Transition(Idle, Walk), Transition(Jump, Walk)],
+    Event.GROW: [
+        Transition(Idle, Grow),
+        Transition(Walk, Grow),
+        Transition(Jump, Grow)
+    ],
+    Event.DIE: [
+        Transition(Idle, Die),
+        Transition(Walk, Die)
+    ],
+    Event.JUMP: [
+        Transition(Idle, Jump),
+        Transition(Walk, Jump)
+    ]
+}
+
+STATES_BIG = [Idle, Walk, Jump, Shrink, Die]
+
+TRANSITIONS_BIG = {
+    Event.IDLE: [Transition(Walk, Idle), Transition(Jump, Idle)],
+    Event.WALK: [Transition(Idle, Walk), Transition(Jump, Walk)],
+    Event.SHRINK: [
+        Transition(Idle, Shrink),
+        Transition(Walk, Shrink),
+        Transition(Jump, Shrink),
+    ],
+    Event.DIE: [
+        Transition(Idle, Die),
+        Transition(Walk, Die)
+    ],
+}
 
 class Agent(pygame.sprite.Sprite):
     def __init__(self, name, width, height, scale):
@@ -15,32 +156,13 @@ class Agent(pygame.sprite.Sprite):
         self.control_keys = {}
         self.dead = False
         
-        self.walking = [(2, 0), #walk-0 
-                        (0, 1), #walk-1 
-                        (1, 1), #walk-2
-                        (2, 1), #walk-3
-                        (0, 2), #walk-4
-                        (1, 2), #walk-5
-                        (2, 2), #walk-6
-                        (3, 0)] #walk-7
-        self.walking_r = [(2, 3), #walk-0 
-                        (0, 4), #walk-1 
-                        (1, 4), #walk-2
-                        (2, 4), #walk-3
-                        (0, 5), #walk-4
-                        (1, 5), #walk-5
-                        (2, 5), #walk-6
-                        (3, 3)] #walk-7
+        self.fsm = FSM(STATES_MINI, TRANSITIONS_MINI)
 
-        self.idle = (0, 0)
-        self.idle_r = (0, 3)
-        self.jump_sprite = (3, 1)
-        self.jump_r = (3, 4)
         self.walking_pointer = 0
-        
-        self.facing_dir = Directions.RIGHT # starts facing right
+        self.jumping = 0
         self.direction = Directions.RIGHT
-        frameX, frameY = self.idle_r
+        
+        frameX, frameY = (0, 3) # idle coords
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.rect = self.image.get_rect()
         self.HEIGHT = height*scale
@@ -64,37 +186,46 @@ class Agent(pygame.sprite.Sprite):
             right: Right}
 
     def commands(self, control):
+        c_event = Event.IDLE
         if control in self.control_keys.keys():
+            
             cmd = self.control_keys[control]()
-            cmd.execute(self)
-            return cmd
+            
+            if isinstance(cmd,Right):
+                c_event = Event.WALK
+                self.direction = Directions.RIGHT
+                self.fsm.update(c_event, self, dir=Directions.RIGHT)
+                
+                return
+            elif isinstance(cmd,Left):
+                c_event = Event.WALK
+                self.direction = Directions.LEFT
+                self.fsm.update(c_event, self, dir=Directions.LEFT)
+                return
+            elif isinstance(cmd,Up):
+                c_event = Event.JUMP
+
+        self.fsm.update(c_event, self)
+        return None
  
     def update(self):
         # Get body
         x, y = self.rect.x, self.rect.y
         
-        #if tux is jumping, render jump sprite
-        if self.direction == Directions.UP:
-            if self.facing_dir == Directions.LEFT:
-                frameX, frameY = self.jump_r
-            if self.facing_dir == Directions.RIGHT:
-                frameX, frameY = self.jump_sprite
-
-        #if tux is not jumping nor walking (he could be falling), render idle sprite
-        if self.direction != Directions.RIGHT and self.direction != Directions.LEFT and self.direction != Directions.UP:
-            #tux is idle
-            self.walking_pointer = 0
-            if self.facing_dir == Directions.LEFT:
-                frameX, frameY = self.idle_r
-            elif self.facing_dir == Directions.RIGHT:
-                frameX, frameY = self.idle
-        else:
+        current_state = self.fsm.get_cstate()()
+        
+        if isinstance(current_state,Jump) or self.jumping:
+            #tux is jumping
+            frameX, frameY = Jump().get_xy(self.direction)
+        elif isinstance(current_state, Walk):
             #tux is walking
-            if self.direction == Directions.LEFT:
-                frameX, frameY = self.walking_r[self.walking_pointer]
-            elif self.direction == Directions.RIGHT:
-                frameX, frameY = self.walking[self.walking_pointer]
-            self.walking_pointer = (self.walking_pointer + 1) % len(self.walking)
+            frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
+        #if tux is not jumping nor walking (he could be falling), render idle sprite
+        elif isinstance(current_state, Idle):
+            #tux is idle
+            frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
+        else:
+            print("ERROR")
         
         # Gravity
         self.calc_grav()
@@ -102,6 +233,55 @@ class Agent(pygame.sprite.Sprite):
         # Move left/right
         self.rect.x += self.change_x
  
+        # verify collisions
+        frameX, frameY = self.collisions(frameX, frameY)
+
+        self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
+        self.prev_body = x, y
+        # if self.direction == Directions.LEFT or self.direction == Directions.RIGHT:
+        #     self.facing_dir = self.direction
+ 
+    def calc_grav(self):
+        """ Calculate effect of gravity. """
+        if self.change_y == 0:
+            self.change_y = 1
+        else:
+            self.jumping = 1
+            self.change_y += .35
+ 
+        # See if we are on the ground
+        if self.rect.y >= self.HEIGHT - self.rect.height and self.change_y >= 0:
+            self.change_y = 0
+            self.rect.y = self.HEIGHT - self.rect.height
+ 
+    def jump(self, previous):
+        """ Called when user hits 'jump' button. """
+        # move down a bit and see if there is a platform below us.
+        # Move down 2 pixels because it doesn't work well if we only move down 1
+        # when working with a platform moving down.
+        self.rect.y += 2
+        platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
+        self.rect.y -= 2
+ 
+        # If it is ok to jump, set our speed upwards
+        if len(platform_hit_list) > 0 or self.rect.bottom >= self.HEIGHT:
+            self.change_y = -10
+        
+        self.jumping = 1
+        if previous==Walk:
+            self.fsm.update(Event.WALK, self, dir=self.direction)
+        else:
+            self.fsm.update(Event.IDLE, self)
+ 
+    # Player-controlled movement:
+    def move(self, direction):
+        self.direction = direction
+        if direction == Directions.LEFT:
+            self.change_x = -6
+        elif direction == Directions.RIGHT:
+            self.change_x = 6
+
+    def collisions(self, frameX, frameY):
         # See if we hit anything
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
@@ -131,59 +311,10 @@ class Agent(pygame.sprite.Sprite):
 
         #making sure that tux changes to idle when he lands on the ground and does not move
         if self.change_y == 0 and self.change_x == 0:
-            self.walking_pointer = 0
-            if self.facing_dir == Directions.LEFT:
-                frameX, frameY = self.idle_r
-            elif self.facing_dir == Directions.RIGHT:
-                frameX, frameY = self.idle
-
-        self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
-        self.prev_body = x, y
-        if self.direction == Directions.LEFT or self.direction == Directions.RIGHT:
-            self.facing_dir = self.direction
- 
-    def calc_grav(self):
-        """ Calculate effect of gravity. """
-        if self.change_y == 0:
-            self.change_y = 1
-        else:
-            self.change_y += .35
- 
-        # See if we are on the ground
-        if self.rect.y >= self.HEIGHT - self.rect.height and self.change_y >= 0:
-            self.change_y = 0
-            self.rect.y = self.HEIGHT - self.rect.height
- 
-    def jump(self):
-        """ Called when user hits 'jump' button. """
-        self.direction = Directions.UP
-        # move down a bit and see if there is a platform below us.
-        # Move down 2 pixels because it doesn't work well if we only move down 1
-        # when working with a platform moving down.
-        self.rect.y += 2
-        platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
-        self.rect.y -= 2
- 
-        # If it is ok to jump, set our speed upwards
-        if len(platform_hit_list) > 0 or self.rect.bottom >= self.HEIGHT:
-            self.change_y = -10
- 
-    # Player-controlled movement:
-    def move(self, direction):
-        self.direction = direction
-        if direction == Directions.LEFT:
-            self.change_x = -6
-        elif direction == Directions.RIGHT:
-            self.change_x = 6
-
-
-    # def go_left(self):
-    #     """ Called when the user hits the left arrow. """
-    #     self.change_x = -6
- 
-    # def go_right(self):
-    #     """ Called when the user hits the right arrow. """
-    #     self.change_x = 6
+            self.jumping = 0
+            self.fsm.update(Event.IDLE, self)
+                
+        return frameX, frameY
  
     def stop(self):
         """ Called when the user lets off the keyboard. """
