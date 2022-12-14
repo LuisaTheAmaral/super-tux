@@ -76,7 +76,6 @@ class Jump(State):
         super().__init__(self.__class__.__name__)
 
     def update(self, object, dir, previous):
-        
         object.jump(previous)
     
     def get_xy(self, dir):
@@ -159,7 +158,6 @@ class Agent(pygame.sprite.Sprite):
         self.fsm = FSM(STATES_MINI, TRANSITIONS_MINI)
 
         self.walking_pointer = 0
-        self.jumping = 0
         self.direction = Directions.RIGHT
         
         frameX, frameY = (0, 3) # idle coords
@@ -214,7 +212,9 @@ class Agent(pygame.sprite.Sprite):
         
         current_state = self.fsm.get_cstate()()
         
-        if isinstance(current_state,Jump) or self.jumping:
+        print(current_state)
+        
+        if isinstance(current_state,Jump):
             #tux is jumping
             frameX, frameY = Jump().get_xy(self.direction)
         elif isinstance(current_state, Walk):
@@ -238,15 +238,12 @@ class Agent(pygame.sprite.Sprite):
 
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.prev_body = x, y
-        # if self.direction == Directions.LEFT or self.direction == Directions.RIGHT:
-        #     self.facing_dir = self.direction
  
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
             self.change_y = 1
         else:
-            self.jumping = 1
             self.change_y += .35
  
         # See if we are on the ground
@@ -266,12 +263,6 @@ class Agent(pygame.sprite.Sprite):
         # If it is ok to jump, set our speed upwards
         if len(platform_hit_list) > 0 or self.rect.bottom >= self.HEIGHT:
             self.change_y = -10
-        
-        self.jumping = 1
-        if previous==Walk:
-            self.fsm.update(Event.WALK, self, dir=self.direction)
-        else:
-            self.fsm.update(Event.IDLE, self)
  
     # Player-controlled movement:
     def move(self, direction):
@@ -311,7 +302,6 @@ class Agent(pygame.sprite.Sprite):
 
         #making sure that tux changes to idle when he lands on the ground and does not move
         if self.change_y == 0 and self.change_x == 0:
-            self.jumping = 0
             self.fsm.update(Event.IDLE, self)
                 
         return frameX, frameY

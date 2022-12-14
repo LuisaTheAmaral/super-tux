@@ -3,7 +3,6 @@ from common import Directions
 class State:
     def __init__(self, name) -> None:
         self.name = name
-        self.walking_pointer = 0
 
     def enter(self):
         print(f"Entering {self.name}")
