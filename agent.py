@@ -110,6 +110,17 @@ class Shrink(State):
         #print("Tux Growing")
         return super().update(object)
     
+STATES = [Grow, Shrink]
+
+TRANSITIONS = {
+    Event.GROW: [
+        Transition(Shrink, Grow)
+    ],
+    Event.SHRINK: [
+        Transition(Grow, Shrink)
+    ]
+}
+
 STATES_MINI = [Idle, Walk, Jump, Grow, Die]
 
 TRANSITIONS_MINI = {
@@ -144,6 +155,10 @@ TRANSITIONS_BIG = {
         Transition(Idle, Die),
         Transition(Walk, Die)
     ],
+    Event.JUMP: [
+        Transition(Idle, Jump),
+        Transition(Walk, Jump)
+    ]
 }
 
 class Agent(pygame.sprite.Sprite):
@@ -155,7 +170,14 @@ class Agent(pygame.sprite.Sprite):
         self.control_keys = {}
         self.dead = False
         
-        self.fsm = FSM(STATES_MINI, TRANSITIONS_MINI)
+        # state machine responsible for tux in big or mini
+        self.fsm_main = FSM(STATES, TRANSITIONS)
+        
+        # state machine when tux is mini
+        self.fsm_mini = FSM(STATES_MINI, TRANSITIONS_MINI)
+        
+        # state machine when tux is big
+        self.fsm_max = FSM(STATES_BIG, TRANSITIONS_BIG)
 
         self.walking_pointer = 0
         self.direction = Directions.RIGHT
@@ -186,33 +208,29 @@ class Agent(pygame.sprite.Sprite):
     def commands(self, control):
         c_event = Event.IDLE
         if control in self.control_keys.keys():
-            
             cmd = self.control_keys[control]()
             
             if isinstance(cmd,Right):
                 c_event = Event.WALK
                 self.direction = Directions.RIGHT
-                self.fsm.update(c_event, self, dir=Directions.RIGHT)
-                
+                self.fsm_mini.update(c_event, self, dir=Directions.RIGHT)   
                 return
             elif isinstance(cmd,Left):
                 c_event = Event.WALK
                 self.direction = Directions.LEFT
-                self.fsm.update(c_event, self, dir=Directions.LEFT)
+                self.fsm_mini.update(c_event, self, dir=Directions.LEFT)
                 return
             elif isinstance(cmd,Up):
                 c_event = Event.JUMP
 
-        self.fsm.update(c_event, self)
+        self.fsm_mini.update(c_event, self)
         return None
  
     def update(self):
         # Get body
         x, y = self.rect.x, self.rect.y
         
-        current_state = self.fsm.get_cstate()()
-        
-        print(current_state)
+        current_state = self.fsm_mini.get_cstate()()
         
         if isinstance(current_state,Jump):
             #tux is jumping
@@ -302,7 +320,7 @@ class Agent(pygame.sprite.Sprite):
 
         #making sure that tux changes to idle when he lands on the ground and does not move
         if self.change_y == 0 and self.change_x == 0:
-            self.fsm.update(Event.IDLE, self)
+            self.fsm_mini.update(Event.IDLE, self)
                 
         return frameX, frameY
  
