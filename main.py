@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import math
 from agent import Agent
+from tux import Tux
 from platforms import Platform
 from level import Level
 
@@ -82,7 +83,7 @@ def main(width, height, scale):
     pygame.display.set_caption("Tux")
  
     # Create the player
-    player = Agent("Tux", width, height, scale)
+    player = Tux("Tux", width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
  
     # Create all the levels

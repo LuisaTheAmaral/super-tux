@@ -32,7 +32,8 @@ class FSM:
     def update(self, event, object, dir=Directions.RIGHT):
         prev = None
         if event:
-            #print(self._transitions.get(event))
+            if self._transitions.get(event)==None:
+                print(self._transitions)
             for trans in self._transitions.get(event):
                 if trans._from == self.current:
                     prev = self.current
