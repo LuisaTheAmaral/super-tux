@@ -9,56 +9,28 @@ class Directions(Enum):
     LEFT = (-1,0)
     RIGHT = (1,0)
 
-class Actor:
-    def __init__(self):
-        self.name = "Unknown"
-
-    def move(self, direction: Directions):
-        raise NotImplemented
-
 class Command:
     def __init__(self) -> None:
-        self.actor = None
-        self.dt = datetime.now()
-
-    def execute(self, actor):
-        raise NotImplemented
-
-    def __str__(self):
-        return f"[{self.dt}] {self.actor.name}: {self.__class__.__name__}"
+        pass
 
 class Up(Command):
-    def execute(self, actor):
+    def __init__(self) -> None:
         pass
-        # self.actor = actor
-        # actor.jump()
-
+    
 class Left(Command):
-    def __init__(self)->None:
-        self.dir = Directions.LEFT    #left
-        
-    # def execute(self, actor):
-    #     self.actor = actor
-    #     # actor.move(Directions.LEFT)
+    def __init__(self) -> None:
+        pass
 
 class Down(Command):
-    def execute(self, actor):
-        #not used yet
+    def __init__(self) -> None:
         pass
-        # self.actor = actor
-        # actor.move(Directions.DOWN)
 
 class Right(Command):
-    def __init__(self)->None:
-        self.dir = Directions.RIGHT    #right
-        
-    def execute(self, actor):
+    def __init__(self) -> None:
         pass
-        # self.actor = actor
-        # actor.move(Directions.RIGHT)
-        
+    
 class Stop(Command):
-    def __init__(self)->None:
-        self.dir = None    #right
+    def __init__(self) -> None:
+        pass
     
 

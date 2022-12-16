@@ -22,10 +22,10 @@ class Agent(pygame.sprite.Sprite):
         frameX, frameY = (0, 3) # idle coords
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.rect = self.image.get_rect()
+        print(self.rect)
         self.HEIGHT = height*scale
         self.WIDTH = width*scale
  
-        self.rect = self.image.get_rect()
         self.prev_body = (340, height - self.rect.height)
  
         # Set speed vector of player
@@ -98,9 +98,18 @@ class Agent(pygame.sprite.Sprite):
             # set our right side to the left side of the item we hit
             if self.change_x > 0:
                 self.rect.right = block.rect.left
+                try:
+                    self.direction_auto = Directions.LEFT
+                except:
+                    pass
+                    
             elif self.change_x < 0:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = block.rect.right
+                try:
+                    self.direction_auto = Directions.RIGHT
+                except:
+                    pass
  
         # Move up/down
         self.rect.y += self.change_y

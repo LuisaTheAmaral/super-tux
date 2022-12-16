@@ -5,16 +5,17 @@ from agent import Agent
 from tux import Tux
 from platforms import Platform
 from level import Level
+from monster import *
 
 # Create platforms for the level
 class Level_01(Level):
     """ Definition for level 1. """
  
-    def __init__(self, player):
+    def __init__(self, player, enemies={}):
         """ Create level 1. """
  
         # Call the parent constructor
-        Level.__init__(self, player)
+        Level.__init__(self, player, enemies)
  
         self.level_limit = -1000
  
@@ -39,7 +40,7 @@ class Level_02(Level):
     """ Definition for level 2. """
  
     def __init__(self, player):
-        """ Create level 1. """
+        """ Create level 2. """
  
         # Call the parent constructor
         Level.__init__(self, player)
@@ -85,6 +86,7 @@ def main(width, height, scale):
     # Create the player
     player = Tux("Tux", width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
+    
  
     # Create all the levels
     level_list = []
@@ -168,6 +170,7 @@ def main(width, height, scale):
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
+                snow.level = current_level
  
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
         current_level.draw(screen)

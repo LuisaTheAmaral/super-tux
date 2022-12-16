@@ -5,13 +5,16 @@ class Level():
         Create a child class for each level with level-specific
         info. """
  
-    def __init__(self, player):
+    def __init__(self, player, enemies={}):
         """ Constructor. Pass in a handle to player. Needed for when moving
             platforms collide with the player. """
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
         self.player = player
- 
+        
+        for enemy in enemies:
+            self.enemy_list.add(enemy)
+
         # How far this world has been scrolled left/right
         self.world_shift = 0
  

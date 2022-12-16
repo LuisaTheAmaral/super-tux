@@ -40,10 +40,9 @@ class FSM:
                     self.current.exit(object)
                     self.current = trans._to
                     self.current.enter(object)
-        # print(self.current)
-        # print(dir)
+        
         self.current.update(self.current,object=object,dir=dir,previous=prev)
-
+        
         if self.current == self.end:
             self.current.exit(object)
             return False

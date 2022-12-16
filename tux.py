@@ -55,7 +55,6 @@ class Walk(State):
         super().__init__(self.__class__.__name__)
 
     def update(self, object, dir, previous):
-        
         if dir==Directions.LEFT:
             object.move(Directions.LEFT)
         else:
@@ -164,8 +163,12 @@ TRANSITIONS_BIG = {
 class Tux(Agent):
     def __init__(self, name, width, height, scale):
         super().__init__(name, width, height, scale)
-        self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
+        
+        self.rect.x = 0
+        self.rect.y = 700
+        
+        self.prev_body = (540, self.rect.height + 10000)
         
         # state machine responsible for tux in big or mini
         self.fsm_main = FSM(STATES, TRANSITIONS)

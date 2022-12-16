@@ -131,3 +131,4 @@ dmypy.json
 sprites/official
 assets/media-master
 assets/media-master.zip
+.vscode/launch.json
