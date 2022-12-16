@@ -87,10 +87,11 @@ def main(width, height, scale):
     player = Tux("Tux", width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
     
+    snowball = Snowball(width, height, scale)
  
     # Create all the levels
     level_list = []
-    level_list.append(Level_01(player))
+    level_list.append(Level_01(player,{snowball}))
     # level_list.append(Level_02(player))
  
     # Set the current level
@@ -99,8 +100,10 @@ def main(width, height, scale):
  
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
+    snowball.level = current_level
  
     active_sprite_list.add(player)
+    active_sprite_list.add(snowball)
  
     # Loop until the user clicks the close button.
     done = False
@@ -170,7 +173,7 @@ def main(width, height, scale):
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
-                snow.level = current_level
+                snowball.level = current_level
  
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
         current_level.draw(screen)
