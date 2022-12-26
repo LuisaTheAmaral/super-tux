@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import math
 from agent import Agent
-from platforms import Platform
+from platforms import Platform, WoodPlatform, SnowPlatform
 from level import Level
 
 # Create platforms for the level
@@ -18,47 +18,50 @@ class Level_01(Level):
         self.level_limit = -1000
  
         # Array with width, height, x, and y of platform
-        level = [[96, 32, 500, 500],
-                 [96, 32, 800, 400],
-                 [96, 32, 1000, 500],
-                 [96, 32, 1120, 280],
+        level = [[500, 100, 0, 500],
+                [1000, 300, 560, 375]
+                #  [800, 400],
+                #  [1000, 500],
+                #  [1120, 280],
+                #  [30, 450],
+                #  [800, 400],
+                #  [1000, 500],
+                #  [1120, 280],
                  ]
  
         # Go through the array above and add platforms
         for platform in level:
-            block = Platform(platform[0], platform[1], platform[2], platform[3])
-            # block.rect.x = platform[2]
-            # block.rect.y = platform[3]
+            block = SnowPlatform(platform[0], platform[1], platform[2], platform[3])
             block.player = self.player
             self.platform_list.add(block)
  
  
-# Create platforms for the level
-class Level_02(Level):
-    """ Definition for level 2. """
+# # Create platforms for the level
+# class Level_02(Level):
+#     """ Definition for level 2. """
  
-    def __init__(self, player):
-        """ Create level 1. """
+#     def __init__(self, player):
+#         """ Create level 1. """
  
-        # Call the parent constructor
-        Level.__init__(self, player)
+#         # Call the parent constructor
+#         Level.__init__(self, player)
  
-        self.level_limit = -1000
+#         self.level_limit = -1000
  
-        # Array with type of platform, and x, y location of the platform.
-        level = [[210, 30, 450, 570],
-                 [210, 30, 850, 420],
-                 [210, 30, 1000, 520],
-                 [210, 30, 1120, 280],
-                 ]
+#         # Array with type of platform, and x, y location of the platform.
+#         level = [[210, 30, 450, 570],
+#                  [210, 30, 850, 420],
+#                  [210, 30, 1000, 520],
+#                  [210, 30, 1120, 280],
+#                  ]
  
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
+#         # Go through the array above and add platforms
+#         for platform in level:
+#             block = Platform(platform[0], platform[1])
+#             block.rect.x = platform[2]
+#             block.rect.y = platform[3]
+#             block.player = self.player
+#             self.platform_list.add(block)
  
  
 def main(width, height, scale):
