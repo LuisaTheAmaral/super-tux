@@ -1,0 +1,8 @@
+from enum import Enum
+
+class Tiles(Enum):    
+    SNOW_WALL = "99d9ea"
+    WOOD_TILE = "b97a57"
+    ENEMY_FACED_RIGHT = "f75b63"
+    ENEMY_FACED_LEFT = "ed1c24"
+    TUX = "000000"

@@ -1,20 +1,69 @@
 import pygame
+from platforms import SnowPlatform, WoodPlatform
+from PIL import Image
+from tiles import Tiles
 
 class Level():
-    """ This is a generic super-class used to define a level.
-        Create a child class for each level with level-specific
-        info. """
- 
-    def __init__(self, player):
-        """ Constructor. Pass in a handle to player. Needed for when moving
-            platforms collide with the player. """
+
+    def __init__(self, filename, player) -> None:
+        self.filename = filename
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
         self.player = player
- 
+        self.level_limit = -1000
+
         # How far this world has been scrolled left/right
         self.world_shift = 0
- 
+        self.coords = []
+
+        self.parse_level_file()
+
+    def parse_level_file(self):
+        img = Image.open(self.filename)
+        pixels = img.load() 
+        width, height = img.size
+        snow_platforms = []
+        wood_platforms = []
+
+        for y in range(height):      
+            for x in range(width):   
+                r, g, b, a = pixels[x, y]
+                hex_code = f"{r:02x}{g:02x}{b:02x}"
+                coords = (x, y)
+
+                if hex_code == Tiles.SNOW_WALL.value:
+                    snow_platforms.append(coords)
+                elif hex_code == Tiles.WOOD_TILE.value:
+                    wood_platforms.append(coords)
+
+        def _get_platform_details(group):
+            x, y = min(group)
+            max_coords = max(group)
+            width, height = max_coords[0] - x+1, max_coords[1] - y+1
+            return x, y, width, height
+
+        def _define_platforms(platforms, type="snow"):
+            groups = [] #list that will store list of points that belong to the same platform
+            for i in range(len(platforms)):
+                point = platforms[i]
+                belong = False
+                for group in groups:
+                    if any(abs(g[0] - point[0]) + abs(g[1] - point[1]) == 1 for g in group):
+                        group.append(point)
+                        belong = True
+                if not belong:
+                    groups.append([point]) #create new list of points to store new platform
+
+            for group in groups:
+                x, y, width, height = _get_platform_details(group)
+                if type == "wood":
+                    self.platform_list.add(WoodPlatform(width*20, height*20, x*20, y*20))
+                else:
+                    self.platform_list.add(SnowPlatform(width*20, height*20, x*20, y*20))
+
+        _define_platforms(snow_platforms, "snow")
+        _define_platforms(wood_platforms, "wood")
+
     def update(self):
         """ Update everything in this level."""
         self.platform_list.update()
@@ -38,5 +87,3 @@ class Level():
  
         for enemy in self.enemy_list:
             enemy.rect.x += shift_x
- 
- 

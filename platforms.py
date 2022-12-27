@@ -5,26 +5,7 @@ from common import ALPHA
 class Platform(pygame.sprite.Sprite):
     """ Platform the user can jump on """
  
-    def __init__(self, sheet, width, height, x, y):
-        super().__init__()
-        self.sheet = sheet
-        self.image = pygame.Surface([width, height], pygame.SRCALPHA)
-        self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
-
-        #scaled = pygame.transform.scale(self.image, (1500, 1500))
-        self.image.blit(self.sheet.sheet, (0,0))
-        self.rect = self.image.get_rect()
-        
-        self.rect.x = x
-        self.rect.y = y 
-
-class WoodPlatform(Platform):
-    def __init__(self, width, height, x, y):
-        super().__init__(SpriteSheet("assets/blocks/block_horiz.png"), 96, 32, x, y)
-
-class SnowPlatform(pygame.sprite.Sprite):
-    
-    def __init__(self, width, height, x, y):
+    def __init__(self, sheets, width, height, x, y):
         super().__init__()
         
         x_cursor = 0
@@ -33,41 +14,51 @@ class SnowPlatform(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height], pygame.SRCALPHA)
         self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
         
-        self.sheet1 = SpriteSheet("assets/snow_block_1.png").sheet
-        self.sheet2 = SpriteSheet("assets/snow_block_2.png").sheet
-        self.sheet3 = SpriteSheet("assets/snow_block_3.png").sheet
-        self.sheet1_snow = SpriteSheet("assets/snow_block_4.png").sheet
-        self.sheet2_snow = SpriteSheet("assets/snow_block_5.png").sheet
-        self.sheet3_snow = SpriteSheet("assets/snow_block_6.png").sheet
+        self.top_left_sheet = SpriteSheet(sheets[0]).sheet
+        self.bottom_left_sheet = SpriteSheet(sheets[1]).sheet
+        self.top_right_sheet = SpriteSheet(sheets[2]).sheet
+        self.bottom_right_sheet = SpriteSheet(sheets[3]).sheet
+        self.top_sheet = SpriteSheet(sheets[4]).sheet
+        self.bottom_sheet = SpriteSheet(sheets[5]).sheet
         
         while ( y_cursor < height ):
             if y_cursor == 0: #snow
-                self.image.blit( self.sheet1_snow, ( 0, y_cursor ) )
+                self.image.blit( self.top_left_sheet, ( 0, y_cursor ) )
             else: #wall tile
-                self.image.blit( self.sheet1, ( 0, y_cursor ) )
-            y_cursor += self.sheet1.get_height()
+                self.image.blit( self.bottom_left_sheet, ( 0, y_cursor ) )
+            y_cursor += self.bottom_left_sheet.get_height()
             
         y_cursor = 0
-        x_cursor = self.sheet1.get_width()
+        x_cursor = self.bottom_left_sheet.get_width()
         while ( y_cursor < height ):
-            while ( x_cursor < width-self.sheet3.get_width() ):
+            while ( x_cursor < width-self.top_right_sheet.get_width() ):
                 if y_cursor == 0: #snow
-                    self.image.blit( self.sheet2_snow, ( x_cursor, y_cursor ) )
+                    self.image.blit( self.top_sheet, ( x_cursor, y_cursor ) )
                 else: #wall tile
-                    self.image.blit( self.sheet2, ( x_cursor, y_cursor ) )
-                x_cursor += self.sheet2.get_width()
-            y_cursor += self.sheet2.get_height()
-            x_cursor = self.sheet1.get_width()
+                    self.image.blit( self.bottom_sheet, ( x_cursor, y_cursor ) )
+                x_cursor += self.bottom_sheet.get_width()
+            y_cursor += self.bottom_sheet.get_height()
+            x_cursor = self.bottom_left_sheet.get_width()
         
         y_cursor = 0
-        x_cursor = width-self.sheet3.get_width()
+        x_cursor = width-self.bottom_right_sheet.get_width()
         while ( y_cursor < height ):
             if y_cursor == 0: #snow
-                self.image.blit( self.sheet3_snow, ( x_cursor, y_cursor ) )
+                self.image.blit( self.top_right_sheet, ( x_cursor, y_cursor ) )
             else: #wall tile
-                self.image.blit( self.sheet3, ( x_cursor, y_cursor ) )
-            y_cursor += self.sheet3.get_height()
+                self.image.blit( self.bottom_right_sheet, ( x_cursor, y_cursor ) )
+            y_cursor += self.bottom_right_sheet.get_height()
         
         self.rect = self.image.get_rect()
         self.rect.x = x
-        self.rect.y = y 
+        self.rect.y = y
+
+class WoodPlatform(Platform):
+    def __init__(self, width, height, x, y):
+        sheets = [f"assets/wood_{x}.png" for x in range(1,7)]
+        super().__init__(sheets, width, height, x, y)
+
+class SnowPlatform(Platform):
+    def __init__(self, width, height, x, y):
+        sheets = [f"assets/snow_{x}.png" for x in range(1,7)]
+        super().__init__(sheets, width, height, x, y)
