@@ -5,4 +5,4 @@ class Tiles(Enum):
     WOOD_TILE = "b97a57"
     ENEMY_FACED_RIGHT = "f75b63"
     ENEMY_FACED_LEFT = "ed1c24"
-    TUX = "000000"
+    TUX = "1a237e"

@@ -24,18 +24,18 @@ def main(width, height, scale):
  
     pygame.display.set_caption("Tux")
  
-    # Create the player
-    player = Agent("Tux", width, height, scale)
-    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
- 
     # Create all the levels
     level_list = []
-    level_list.append(Level("levels/level1.png", player))
-    # level_list.append(Level_02(player))
+    level_list.append(Level("levels/level1.png", scale=20))
  
     # Set the current level
     current_level_no = 0
     current_level = level_list[current_level_no]
+
+    # Create the player
+    x, y = current_level.player_start_position
+    player = Agent("Tux", x, y, width, height, scale)
+    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
  
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level

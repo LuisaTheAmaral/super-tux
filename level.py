@@ -5,12 +5,13 @@ from tiles import Tiles
 
 class Level():
 
-    def __init__(self, filename, player) -> None:
+    def __init__(self, filename, scale=20) -> None:
         self.filename = filename
+        self.scale = scale
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
-        self.player = player
         self.level_limit = -1000
+        self.player_start_position = (0, 0)
 
         # How far this world has been scrolled left/right
         self.world_shift = 0
@@ -35,6 +36,8 @@ class Level():
                     snow_platforms.append(coords)
                 elif hex_code == Tiles.WOOD_TILE.value:
                     wood_platforms.append(coords)
+                elif hex_code == Tiles.TUX.value:
+                    self.player_start_position = (x, y)
 
         def _get_platform_details(group):
             x, y = min(group)
@@ -57,9 +60,9 @@ class Level():
             for group in groups:
                 x, y, width, height = _get_platform_details(group)
                 if type == "wood":
-                    self.platform_list.add(WoodPlatform(width*20, height*20, x*20, y*20))
+                    self.platform_list.add(WoodPlatform(width*self.scale, height*self.scale, x*self.scale, y*self.scale))
                 else:
-                    self.platform_list.add(SnowPlatform(width*20, height*20, x*20, y*20))
+                    self.platform_list.add(SnowPlatform(width*self.scale, height*self.scale, x*self.scale, y*self.scale))
 
         _define_platforms(snow_platforms, "snow")
         _define_platforms(wood_platforms, "wood")

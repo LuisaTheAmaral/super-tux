@@ -7,11 +7,11 @@ import logging
 CELL_SIZE = 50
 
 class Agent(pygame.sprite.Sprite):
-    def __init__(self, name, width, height, scale):
+    def __init__(self, name, initial_x, initial_y, width, height, scale):
         super().__init__()
         self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
-        self.SCALE = scale
+        self.scale = scale
         self.control_keys = {}
         self.dead = False
         
@@ -41,18 +41,18 @@ class Agent(pygame.sprite.Sprite):
         self.facing_dir = Directions.RIGHT # starts facing right
         self.direction = Directions.RIGHT
         frameX, frameY = self.idle_r
+        
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.rect = self.image.get_rect()
-        self.HEIGHT = height*scale
-        self.WIDTH = width*scale
- 
-        self.rect = self.image.get_rect()
-        self.prev_body = (340, height - self.rect.height)
- 
+        self.rect.x, self.rect.y = initial_x*self.scale, initial_y*self.scale #set initial player position
+
+        self.HEIGHT = height*self.scale
+        self.WIDTH = width*self.scale
+  
         # Set speed vector of player
         self.change_x = 0
         self.change_y = 0
- 
+
         # List of level sprites
         self.level = None
 
@@ -69,9 +69,7 @@ class Agent(pygame.sprite.Sprite):
             cmd.execute(self)
             return cmd
  
-    def update(self):
-        # Get body
-        x, y = self.rect.x, self.rect.y
+    def update(self):        
         
         #if tux is jumping, render jump sprite
         if self.direction == Directions.UP:
@@ -138,7 +136,6 @@ class Agent(pygame.sprite.Sprite):
                 frameX, frameY = self.idle
 
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
-        self.prev_body = x, y
         if self.direction == Directions.LEFT or self.direction == Directions.RIGHT:
             self.facing_dir = self.direction
  
