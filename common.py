@@ -1,6 +1,8 @@
 from enum import Enum
 from datetime import datetime
 
+ALPHA = (0, 255, 0)
+
 class Directions(Enum):
     UP = (0,-1)
     DOWN = (0,1)
@@ -28,7 +30,7 @@ class Command:
 class Up(Command):
     def execute(self, actor):
         self.actor = actor
-        actor.move(Directions.UP)
+        actor.jump()
 
 class Left(Command):
     def execute(self, actor):
@@ -37,6 +39,7 @@ class Left(Command):
 
 class Down(Command):
     def execute(self, actor):
+        #not used yet
         self.actor = actor
         actor.move(Directions.DOWN)
 
