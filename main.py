@@ -26,7 +26,9 @@ def main(width, height, scale):
  
     # Create all the levels
     level_list = []
-    level_list.append(Level("levels/level1.png", scale=20))
+    level_list.append(Level("levels/level1.png", scale=scale))
+    level_list.append(Level("levels/level2.png", scale=scale))
+    level_list.append(Level("levels/level1.png", scale=scale))
  
     # Set the current level
     current_level_no = 0
@@ -98,13 +100,20 @@ def main(width, height, scale):
             current_level.shift_world(diff)
  
         # If the player gets to the end of the level, go to the next level
-        current_position = player.rect.x + current_level.world_shift
-        if current_position < current_level.level_limit:
-            player.rect.x = 120
+        block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
+        if block_hit_list:
+            print(f"LEVEL {current_level_no+1} COMPLETED")
+            player.stop() #temporary
+
+        # current_position = player.rect.x + current_level.world_shift
+        # if current_position < current_level.level_limit:
+        #     player.rect.x = 120
             if current_level_no < len(level_list)-1:
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
+                x, y = current_level.player_start_position
+                player.set_start_position(x, y)
  
         current_level.draw(screen)
         active_sprite_list.draw(screen)

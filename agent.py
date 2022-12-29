@@ -44,7 +44,7 @@ class Agent(pygame.sprite.Sprite):
         
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = initial_x*self.scale, initial_y*self.scale #set initial player position
+        self.set_start_position(initial_x, initial_y) #set player initial  position 
 
         self.HEIGHT = height*self.scale
         self.WIDTH = width*self.scale
@@ -55,6 +55,9 @@ class Agent(pygame.sprite.Sprite):
 
         # List of level sprites
         self.level = None
+
+    def set_start_position(self, x, y):
+        self.rect.x, self.rect.y = x*self.scale, y*self.scale
 
     def controls(self, up, left, down, right):
         self.control_keys = {

@@ -6,3 +6,5 @@ class Tiles(Enum):
     ENEMY_FACED_RIGHT = "f75b63"
     ENEMY_FACED_LEFT = "ed1c24"
     TUX = "1a237e"
+    HOME = "616161"
+    GOAL = "3e2723"
