@@ -2,66 +2,9 @@ import pygame
 from pygame.locals import *
 import math
 from agent import Agent
+from level import Level 
 from tux import Tux
-from platforms import Platform
-from level import Level
-from monster import *
-
-# Create platforms for the level
-class Level_01(Level):
-    """ Definition for level 1. """
- 
-    def __init__(self, player, enemies={}):
-        """ Create level 1. """
- 
-        # Call the parent constructor
-        Level.__init__(self, player, enemies)
- 
-        self.level_limit = -1000
- 
-        # Array with width, height, x, and y of platform
-        level = [[96, 32, 500, 500],
-                 [96, 32, 800, 400],
-                 [96, 32, 1000, 500],
-                 [96, 32, 1120, 280],
-                 ]
- 
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1], platform[2], platform[3])
-            # block.rect.x = platform[2]
-            # block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
- 
- 
-# Create platforms for the level
-class Level_02(Level):
-    """ Definition for level 2. """
- 
-    def __init__(self, player):
-        """ Create level 2. """
- 
-        # Call the parent constructor
-        Level.__init__(self, player)
- 
-        self.level_limit = -1000
- 
-        # Array with type of platform, and x, y location of the platform.
-        level = [[210, 30, 450, 570],
-                 [210, 30, 850, 420],
-                 [210, 30, 1000, 520],
-                 [210, 30, 1120, 280],
-                 ]
- 
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
- 
+from monster import Snowball
  
 def main(width, height, scale):
     """ Main Program """
@@ -83,27 +26,30 @@ def main(width, height, scale):
  
     pygame.display.set_caption("Tux")
  
-    # Create the player
-    player = Tux("Tux", width, height, scale)
-    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
-    
-    snowball = Snowball(width, height, scale)
- 
+
     # Create all the levels
     level_list = []
-    level_list.append(Level_01(player,{snowball}))
-    # level_list.append(Level_02(player))
+    level_list.append(Level("levels/level1.png", scale=scale))
+    level_list.append(Level("levels/level2.png", scale=scale))
+    level_list.append(Level("levels/level1.png", scale=scale))
  
     # Set the current level
     current_level_no = 0
     current_level = level_list[current_level_no]
+
+    # Create the player
+    x, y = current_level.player_start_position
+    player = Tux("Tux", x, y, width, height, scale)
+    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
+    
+    # snowball = Snowball(50, 50, width, height, scale) # temp location
  
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
-    snowball.level = current_level
+    # snowball.level = current_level
  
     active_sprite_list.add(player)
-    active_sprite_list.add(snowball)
+    # active_sprite_list.add(snowball)
  
     # Loop until the user clicks the close button.
     done = False
@@ -166,20 +112,24 @@ def main(width, height, scale):
             current_level.shift_world(diff)
  
         # If the player gets to the end of the level, go to the next level
-        current_position = player.rect.x + current_level.world_shift
-        if current_position < current_level.level_limit:
-            player.rect.x = 120
+        block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
+        if block_hit_list:
+            print(f"LEVEL {current_level_no+1} COMPLETED")
+            player.stop() #temporary
+
+        # current_position = player.rect.x + current_level.world_shift
+        # if current_position < current_level.level_limit:
+        #     player.rect.x = 120
             if current_level_no < len(level_list)-1:
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
-                snowball.level = current_level
+                # snowball.level = current_level
+                x, y = current_level.player_start_position
+                player.set_start_position(x, y)
  
-        # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
         current_level.draw(screen)
         active_sprite_list.draw(screen)
- 
-        # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
  
         # Limit to 60 frames per second
         clock.tick(60)

@@ -80,8 +80,8 @@ TRANSITIONS = {
 }
 
 class Monster(Agent):
-    def __init__(self, name, width, height, scale) -> None:
-        super().__init__(name, width, height, scale)
+    def __init__(self, x, y, name, width, height, scale) -> None:
+        super().__init__(name, x, y, width, height, scale)
         self.name = name
         self.direction = Directions.LEFT
         self.direction_auto = Directions.LEFT
@@ -90,12 +90,11 @@ class Monster(Agent):
         self.fsm = FSM(STATES, TRANSITIONS)
     
 class Snowball(Monster):
-    def __init__(self, width, height, scale) -> None:
-        super().__init__("snowball", width, height, scale)
+    def __init__(self, x, y, width, height, scale) -> None:
+        super().__init__("snowball", x, y, width, height, scale)
         self.rect.x = 400
         self.rect.y = 700
         self.sheet = SpriteSheet("sprites/spritesheet_enemy.png")
-        self.prev_body = (340, height - self.rect.height)
  
     def comandos(self):
         print("ENTROU")

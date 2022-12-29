@@ -1,32 +1,89 @@
 import pygame
+from platforms import SnowPlatform, WoodPlatform
+from PIL import Image
+from tiles import Tiles
+from goal import Goal, Home
 
 class Level():
-    """ This is a generic super-class used to define a level.
-        Create a child class for each level with level-specific
-        info. """
- 
-    def __init__(self, player, enemies={}):
-        """ Constructor. Pass in a handle to player. Needed for when moving
-            platforms collide with the player. """
+
+    def __init__(self, filename, scale=20) -> None:
+        self.filename = filename
+        self.scale = scale
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
-        self.player = player
-        
-        for enemy in enemies:
-            self.enemy_list.add(enemy)
+        self.goal_list = pygame.sprite.Group()
+        self.level_limit = -1000
+        self.player_start_position = (0, 0)
 
         # How far this world has been scrolled left/right
         self.world_shift = 0
- 
+        self.coords = []
+
+        self.parse_level_file()
+
+    def parse_level_file(self):
+        img = Image.open(self.filename)
+        pixels = img.load() 
+        width, height = img.size
+        snow_platforms = []
+        wood_platforms = []
+
+        for y in range(height):      
+            for x in range(width):   
+                r, g, b, a = pixels[x, y]
+                hex_code = f"{r:02x}{g:02x}{b:02x}"
+                coords = (x, y)
+
+                if hex_code == Tiles.SNOW_WALL.value:
+                    snow_platforms.append(coords)
+                elif hex_code == Tiles.WOOD_TILE.value:
+                    wood_platforms.append(coords)
+                elif hex_code == Tiles.TUX.value:
+                    self.player_start_position = (x, y)
+                elif hex_code == Tiles.GOAL.value:
+                    self.goal_list.add(Goal(x, y, self.scale))
+                elif hex_code == Tiles.HOME.value:
+                    self.goal_list.add(Home(x, y, self.scale))
+
+        def _get_platform_details(group):
+            x, y = min(group)
+            max_coords = max(group)
+            width, height = max_coords[0] - x+1, max_coords[1] - y+1
+            return x, y, width, height
+
+        def _define_platforms(platforms, type="snow"):
+            groups = [] #list that will store list of points that belong to the same platform
+            for i in range(len(platforms)):
+                point = platforms[i]
+                belong = False
+                for group in groups:
+                    if any(abs(g[0] - point[0]) + abs(g[1] - point[1]) == 1 for g in group):
+                        group.append(point)
+                        belong = True
+                if not belong:
+                    groups.append([point]) #create new list of points to store new platform
+
+            for group in groups:
+                x, y, width, height = _get_platform_details(group)
+                if type == "wood":
+                    self.platform_list.add(WoodPlatform(width*self.scale, height*self.scale, x*self.scale, y*self.scale))
+                else:
+                    self.platform_list.add(SnowPlatform(width*self.scale, height*self.scale, x*self.scale, y*self.scale))
+
+        _define_platforms(snow_platforms, "snow")
+        _define_platforms(wood_platforms, "wood")
+
     def update(self):
         """ Update everything in this level."""
         self.platform_list.update()
         self.enemy_list.update()
+        self.goal_list.update()
  
     def draw(self, screen):
         """ Draw everything on this level. """ 
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
+        self.goal_list.draw(screen)
  
     def shift_world(self, shift_x):
         """ When the user moves left/right and we need to scroll
@@ -41,5 +98,6 @@ class Level():
  
         for enemy in self.enemy_list:
             enemy.rect.x += shift_x
- 
- 
+
+        for goal in self.goal_list:
+            goal.rect.x += shift_x

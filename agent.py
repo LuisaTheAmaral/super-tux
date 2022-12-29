@@ -8,32 +8,34 @@ from enum import Enum
 CELL_SIZE = 50
 
 class Agent(pygame.sprite.Sprite):
-    def __init__(self, name, width, height, scale):
+    def __init__(self, name, initial_x, initial_y, width, height, scale):
         super().__init__()
         self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
-        self.SCALE = scale
+        self.scale = scale
         self.control_keys = {}
         self.dead = False
 
         self.walking_pointer = 0
         self.direction = Directions.RIGHT
-        
         frameX, frameY = (0, 3) # idle coords
+        
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
         self.rect = self.image.get_rect()
-        print(self.rect)
-        self.HEIGHT = height*scale
-        self.WIDTH = width*scale
- 
-        self.prev_body = (340, height - self.rect.height)
- 
+        self.set_start_position(initial_x, initial_y) #set player initial  position 
+
+        self.HEIGHT = height*self.scale
+        self.WIDTH = width*self.scale
+  
         # Set speed vector of player
         self.change_x = 0
         self.change_y = 0
- 
+
         # List of level sprites
         self.level = None
+
+    def set_start_position(self, x, y):
+        self.rect.x, self.rect.y = x*self.scale, y*self.scale
 
     def controls(self, up, left, down, right):
         self.control_keys = {
@@ -41,7 +43,6 @@ class Agent(pygame.sprite.Sprite):
             left: Left, 
             down: Down, 
             right: Right}
-
  
     def calc_grav(self):
         """ Calculate effect of gravity. """
@@ -87,7 +88,7 @@ class Agent(pygame.sprite.Sprite):
         frameX, frameY = self.collisions(frameX, frameY)
 
         self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
-        self.prev_body = x, y
+        
             
     def collisions(self, frameX, frameY):
         # See if we hit anything
