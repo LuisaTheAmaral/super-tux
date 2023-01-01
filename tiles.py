@@ -10,3 +10,4 @@ class Tiles(Enum):
     GOAL = "3e2723"
     FLYING_PLATFORM_LIMIT = "ffcc80"
     FLYING_PLATFORM = "ff9800"
+    COIN = "ffff00"

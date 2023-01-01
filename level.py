@@ -3,6 +3,7 @@ from platforms import SnowPlatform, WoodPlatform, FlyingPlatform
 from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
+from coin import Coin
 
 class Level():
 
@@ -12,6 +13,7 @@ class Level():
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
         self.goal_list = pygame.sprite.Group()
+        self.coin_list = pygame.sprite.Group()
         self.level_limit = -1000
         self.player_start_position = (0, 0)
 
@@ -50,6 +52,8 @@ class Level():
                     flying_platforms.append(coords)
                 elif hex_code == Tiles.FLYING_PLATFORM_LIMIT.value:
                     flying_platforms_limits.append(coords)
+                elif hex_code == Tiles.COIN.value:
+                    self.coin_list.add(Coin(x*self.scale, y*self.scale))
 
         def _get_platform_details(group):
             x, y = min(group)
@@ -94,15 +98,19 @@ class Level():
 
     def update(self):
         """ Update everything in this level."""
+        self.coin_list.update()
         self.platform_list.update()
         self.enemy_list.update()
         self.goal_list.update()
+        
  
     def draw(self, screen):
         """ Draw everything on this level. """ 
+        self.coin_list.draw(screen)
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
         self.goal_list.draw(screen)
+        
  
     def shift_world(self, shift_x):
         """ When the user moves left/right and we need to scroll
@@ -120,3 +128,6 @@ class Level():
 
         for goal in self.goal_list:
             goal.rect.x += shift_x
+
+        for coin in self.coin_list:
+            coin.rect.x += shift_x

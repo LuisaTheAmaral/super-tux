@@ -55,18 +55,19 @@ class Platform(pygame.sprite.Sprite):
 
 class WoodPlatform(Platform):
     def __init__(self, width, height, x, y):
-        sheets = [f"assets/wood_{x}.png" for x in range(1,7)]
+        sheets = [f"assets/blocks/wood_{x}.png" for x in range(1,7)]
         super().__init__(sheets, width, height, x, y)
 
 class SnowPlatform(Platform):
     def __init__(self, width, height, x, y):
-        sheets = [f"assets/snow_{x}.png" for x in range(1,7)]
+        sheets = [f"assets/blocks/snow_{x}.png" for x in range(1,7)]
         super().__init__(sheets, width, height, x, y)
 
 class FlyingPlatform(pygame.sprite.Sprite):
     def __init__(self, x, y, y_min_limit, y_max_limit):
         super().__init__()
-        sheets = [f"assets/flying_platform/flying_platform-{x}.png" for x in range(4)]
+        self.sheets = [f"assets/flying_platform/flying_platform-{x}.png" for x in range(4)]
+        self.sheet_pointer = 0
 
         self.y_min = y_min_limit
         self.y_max = y_max_limit
@@ -74,14 +75,21 @@ class FlyingPlatform(pygame.sprite.Sprite):
         self.image = pygame.Surface([128, 61], pygame.SRCALPHA)
         self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
         
-        self.sheet = SpriteSheet(sheets[0]).sheet
+        self.sheet = SpriteSheet(self.sheets[self.sheet_pointer]).sheet
         self.image.blit( self.sheet, ( 0, 0 ) )
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.direction = 1
 
+
     def update(self):
+        self.image.fill("white")
+        self.image.set_colorkey("white")
+
+        self.sheet_pointer = (self.sheet_pointer + 0.20) % 3
+        self.sheet = SpriteSheet(self.sheets[int(self.sheet_pointer)]).sheet
+        self.image.blit( self.sheet, ( 0, 0 ) )
         if self.rect.y == self.y_max:
             self.direction = -1
         elif self.rect.y == self.y_min:
