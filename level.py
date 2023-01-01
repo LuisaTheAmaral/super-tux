@@ -1,5 +1,5 @@
 import pygame
-from platforms import SnowPlatform, WoodPlatform
+from platforms import SnowPlatform, WoodPlatform, FlyingPlatform
 from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
@@ -27,6 +27,8 @@ class Level():
         width, height = img.size
         snow_platforms = []
         wood_platforms = []
+        flying_platforms = []
+        flying_platforms_limits = []
 
         for y in range(height):      
             for x in range(width):   
@@ -44,6 +46,10 @@ class Level():
                     self.goal_list.add(Goal(x, y, self.scale))
                 elif hex_code == Tiles.HOME.value:
                     self.goal_list.add(Home(x, y, self.scale))
+                elif hex_code == Tiles.FLYING_PLATFORM.value:
+                    flying_platforms.append(coords)
+                elif hex_code == Tiles.FLYING_PLATFORM_LIMIT.value:
+                    flying_platforms_limits.append(coords)
 
         def _get_platform_details(group):
             x, y = min(group)
@@ -70,8 +76,21 @@ class Level():
                 else:
                     self.platform_list.add(SnowPlatform(width*self.scale, height*self.scale, x*self.scale, y*self.scale))
 
+        def _define_flying_platforms(flying_platforms, flying_platforms_limits):
+            coords = []
+            for p in flying_platforms:
+                coords.append(p)
+                for pl in flying_platforms_limits:
+                    if p[0] == pl[0]:
+                        coords.append(pl[1])
+                x, y = coords[0]
+                limits = coords[1], coords[2]
+                self.platform_list.add(FlyingPlatform(x*self.scale, y*self.scale, min(limits)*self.scale, max(limits)*self.scale))
+                coords = []
+
         _define_platforms(snow_platforms, "snow")
         _define_platforms(wood_platforms, "wood")
+        _define_flying_platforms(flying_platforms, flying_platforms_limits)
 
     def update(self):
         """ Update everything in this level."""

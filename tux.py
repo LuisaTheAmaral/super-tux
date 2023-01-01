@@ -51,7 +51,6 @@ class Walk(State):
                 (2, 5), #walk-6
                 (3, 3)] #walk-7
     def __init__(self) -> None:
-        print("new WALK")
         super().__init__(self.__class__.__name__)
 
     def update(self, object, dir, previous):
@@ -66,7 +65,6 @@ class Walk(State):
         elif dir == Directions.RIGHT:
             frameX, frameY = self.WALKING[walking_pointer]
         walking_pointer = (walking_pointer + 1) % len(self.WALKING)
-        print(walking_pointer)
         return frameX, frameY, walking_pointer
 
     
@@ -90,7 +88,6 @@ class Grow(State):
         super().__init__(self.__class__.__name__)
 
     def update(self, object, dir):
-        #print("Tux Growing")
         return super().update(object)
     
 class Die(State):
@@ -98,7 +95,6 @@ class Die(State):
         super().__init__(self.__class__.__name__)
 
     def update(self, object,dir):
-        #print("Tux Growing")
         return super().update(object)
     
 class Shrink(State):
@@ -106,7 +102,6 @@ class Shrink(State):
         super().__init__(self.__class__.__name__)
 
     def update(self, object):
-        #print("Tux Growing")
         return super().update(object)
     
 STATES = [Grow, Shrink]

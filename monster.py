@@ -34,7 +34,6 @@ class Walk(State):
                 (0, 1), #walk-1 
                 (0, 2)] #walk-2
     def __init__(self) -> None:
-        print("new WALK")
         super().__init__(self.__class__.__name__)
 
     def update(self, object, dir, previous):
@@ -49,7 +48,6 @@ class Walk(State):
         elif dir == Directions.RIGHT:
             frameX, frameY = self.WALKING[walking_pointer]
         walking_pointer = (walking_pointer + 1) % len(self.WALKING)
-        print(walking_pointer)
         return frameX, frameY, walking_pointer
     
 class Die(State):
@@ -97,7 +95,6 @@ class Snowball(Monster):
         self.sheet = SpriteSheet("sprites/spritesheet_enemy.png")
  
     def comandos(self):
-        print("ENTROU")
         self.fsm.update(Event.WALK, self, dir=Directions.LEFT) 
         return None
  
