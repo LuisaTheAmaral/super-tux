@@ -51,11 +51,6 @@ class Agent(pygame.sprite.Sprite):
         else:
             self.change_y += .35
  
-        # See if we are on the ground
-        if self.rect.y >= self.HEIGHT - self.rect.height and self.change_y >= 0:
-            self.change_y = 0
-            self.rect.y = self.HEIGHT - self.rect.height
- 
     def jump(self, previous):
         """ Called when user hits 'jump' button. """
         # move down a bit and see if there is a platform below us.

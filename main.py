@@ -115,6 +115,11 @@ def main(width, height, scale):
             player.rect.left = 120
             current_level.shift_world(diff)
 
+        #if the player falls to the void the game ends
+        if player.rect.top > SCREEN_HEIGHT:
+            player.kill()
+            done = True
+
 
         # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
         coin_hit_list = pygame.sprite.spritecollide(player, current_level.coin_list, False)
