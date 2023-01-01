@@ -5,6 +5,7 @@ from agent import Agent
 from level import Level 
 from tux import Tux
 from monster import Snowball
+from scoreboard import Scoreboard
  
 def main(width, height, scale):
     """ Main Program """
@@ -37,6 +38,8 @@ def main(width, height, scale):
     current_level_no = 0
     current_level = level_list[current_level_no]
 
+    scoreboard = Scoreboard(SCREEN_WIDTH)
+
     # Create the player
     x, y = current_level.player_start_position
     player = Tux("Tux", x, y, width, height, scale)
@@ -49,6 +52,7 @@ def main(width, height, scale):
     # snowball.level = current_level
  
     active_sprite_list.add(player)
+    active_sprite_list.add(scoreboard)
     # active_sprite_list.add(snowball)
  
     # Loop until the user clicks the close button.
@@ -110,11 +114,21 @@ def main(width, height, scale):
             diff = 120 - player.rect.left
             player.rect.left = 120
             current_level.shift_world(diff)
+
+
+        # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
+        coin_hit_list = pygame.sprite.spritecollide(player, current_level.coin_list, False)
+        for coin in coin_hit_list:
+            current_level.coin_list.remove(coin)
+            scoreboard.increase_points()
  
         # If the player gets to the end of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
         if block_hit_list:
             print(f"LEVEL {current_level_no+1} COMPLETED")
+            if current_level_no == len(level_list) - 1:
+                player.kill()
+                done = True
             player.stop() #temporary
 
         # current_position = player.rect.x + current_level.world_shift
