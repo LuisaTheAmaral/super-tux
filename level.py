@@ -25,6 +25,7 @@ class Level():
         
     def add_enemy(self, enemy):
         self.enemy_list.add(enemy)
+        enemy.level = self
 
     def parse_level_file(self):
         img = Image.open(self.filename)
@@ -106,6 +107,17 @@ class Level():
         self.enemy_list.update()
         self.goal_list.update()
         
+    def send_enemy_commands(self):
+        """ Send command to all enemies."""
+        for enemy in self.enemy_list:
+            if not enemy.dead:
+                enemy.commands(0)
+            else:
+                enemy.commands(1)
+            
+    def kill_enemy(self, enemy):
+        """ Kill enemy."""
+        enemy.commands(1)
  
     def draw(self, screen):
         """ Draw everything on this level. """ 

@@ -5,18 +5,18 @@ from fsm import State,Transition,FSM
 from common import Directions, Up, Left, Right, ALPHA
 import pygame 
 
-# MONSTER STATES  
+# ENEMY STATES  
 class Event(Enum):
     IDLE = 1,
     WALK = 2,
     DIE = 3
 
-# | MONSTER IDLE STATE
+# | ENEMY IDLE STATE
 class Idle(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # stop monster
+    # stop enemy
     def update(self, object, dir, previous):
         object.stop()
         
@@ -29,7 +29,7 @@ class Idle(State):
             frameX, frameY = (1, 1)
         return frameX, frameY, walking_pointer
     
-# | MONSTER WALK STATE
+# | ENEMY WALK STATE
 class Walk(State):
     # walking sprite coords
     WALKING =   [(0, 1), #walk-0
@@ -44,7 +44,7 @@ class Walk(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # move monster
+    # move enemy
     def update(self, object, dir, previous):
         if dir==Directions.LEFT:
             object.move(Directions.LEFT, change_x = 1)
@@ -60,7 +60,7 @@ class Walk(State):
         walking_pointer = (walking_pointer + 0.2) % len(self.WALKING)
         return frameX, frameY, walking_pointer
     
-# | MONSTER DIE STATE
+# | ENEMY DIE STATE
 class Die(State):
     # dead sprite coords
     DEAD = (3,0)
@@ -69,7 +69,7 @@ class Die(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # kill monster
+    # kill enemy
     def update(self, object, dir, previous):
         if object.dead:
             return
@@ -97,15 +97,21 @@ TRANSITIONS = {
     ]
 }
 
-class Monster(Agent):
+class Enemy(Agent):
     def __init__(self, name, width, height, scale) -> None:
         super().__init__(name, width, height, scale)
+        self.width = width
+        self.height = height
+        self.scale = scale
         self.name = name
         self.direction = Directions.LEFT
         self.direction_auto = Directions.LEFT
         
         # state machine responsible for tux in big or mini
         self.fsm = FSM(STATES, TRANSITIONS)
+        
+    def clone(self):
+        return NotImplemented
         
     # move enemy automatically
     def commands(self, dead=0):
@@ -138,13 +144,13 @@ class Monster(Agent):
             self.direction = self.direction_auto
   
         if isinstance(current_state, Walk):
-            #monster is walking
+            #enemy is walking
             frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
         elif isinstance(current_state, Idle):
-            #monster is idle
+            #enemy is idle
             frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
         elif isinstance(current_state, Die):
-            #monster is dead
+            #enemy is dead
             frameX, frameY= current_state.get_xy(dir=self.direction)
         else:
             print("ERROR")
@@ -152,7 +158,7 @@ class Monster(Agent):
         super().update(x,y,frameX,frameY,cell_size=(self.cellsize,self.cellsize))
         
     
-class Snowball(Monster):
+class Snowball(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale) -> None:
         super().__init__("snowball", width, height, scale)
         # load snowball spritesheet
@@ -163,5 +169,12 @@ class Snowball(Monster):
         self.rect = self.image.get_rect()
         
         self.set_start_position(initial_x, initial_y) #set player initial  position 
+        
+    def clone(self, initial_x, initial_y) -> Enemy:
+        return Snowball(initial_x, initial_y, self.width, self.height, self.scale)
+ 
+class Spawner:
+    def spawn_enemy(self, prototype, initial_x, initial_y) -> Enemy:
+        return prototype.clone(initial_x, initial_y)
         
  

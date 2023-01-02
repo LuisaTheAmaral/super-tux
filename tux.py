@@ -298,10 +298,11 @@ class Tux(Agent):
             return frameX, frameY
         
         # verify if tux has colided with any enemy
-        block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
+        #block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
         
         for enemy in self.level.enemy_list:
             if not enemy.dead:
+                block_hit_list = pygame.sprite.spritecollide(self, [enemy], False)
                 for block in block_hit_list:
                     if self.change_x < 10 and self.change_y > 0:
                         if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
@@ -309,7 +310,8 @@ class Tux(Agent):
                             self.been_hit()
                         else:
                             # enemy has been killed - notify enemy
-                            ev = pygame.event.Event(ENEMY_KILLED)
+                            #ev = pygame.event.Event(ENEMY_KILLED)
+                            ev = pygame.event.Event(ENEMY_KILLED, {"enemy": enemy})
                             pygame.event.post(ev)
                 break
             

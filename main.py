@@ -4,7 +4,7 @@ import math
 from agent import Agent
 from level import Level 
 from tux import Tux, ENEMY_KILLED, TUX_DEAD
-from monster import Snowball
+from monster import Snowball, Spawner
 from scoreboard import Scoreboard
  
 def main(width, height, scale):
@@ -44,13 +44,19 @@ def main(width, height, scale):
     player = Tux("Tux", x, y, width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_g)
     
-    snowball = Snowball(x+27, y-4, width, height, scale) # temp location
+    spawner = Spawner()
+    
+    snowbal = Snowball(x+27, y-4, width, height, scale) # temp location
+    
+    snowball = spawner.spawn_enemy(snowbal, x+27, y-4)
+    current_level.add_enemy(snowball)
+    
+    snowball = spawner.spawn_enemy(snowbal, x+28, y-13)
     
     current_level.add_enemy(snowball)
     
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
-    snowball.level = current_level
  
     active_sprite_list.add(player)
     active_sprite_list.add(scoreboard)
@@ -75,8 +81,10 @@ def main(width, height, scale):
                 done = True
               
             # enemy has been killed  
-            if event.type == ENEMY_KILLED: 
-                dead_event = 1
+            if event.type == ENEMY_KILLED:
+                tmp_enemy = event.__dict__["enemy"]
+                print(tmp_enemy)
+                current_level.kill_enemy(tmp_enemy)
                     
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE, pygame.K_g):
@@ -90,8 +98,8 @@ def main(width, height, scale):
                     if cmd:
                         command_log.append(cmd)
         
-        # send command to enemy
-        snowball.commands(dead_event)
+        # send command to enemies
+        current_level.send_enemy_commands()
         
         # Update the player
         active_sprite_list.update()
@@ -133,7 +141,7 @@ def main(width, height, scale):
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
-                snowball.level = current_level
+                # snowball.level = current_level
                 x, y = current_level.player_start_position
                 player.set_start_position(x, y)
  
