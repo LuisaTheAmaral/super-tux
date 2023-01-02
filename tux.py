@@ -68,17 +68,17 @@ class Walk(State):
     # move tux
     def update(self, object, dir, previous):
         if dir==Directions.LEFT:
-            object.move(Directions.LEFT)
+            object.move(Directions.LEFT, change_x = 6)
         else:
-            object.move(Directions.RIGHT)
+            object.move(Directions.RIGHT, change_x = 6)
     
     # getting walking sprite      
     def get_xy(self, dir, walking_pointer):
         if dir == Directions.LEFT:
-            frameX, frameY = self.WALKING_R[walking_pointer]
+            frameX, frameY = self.WALKING_R[int(walking_pointer)]
         elif dir == Directions.RIGHT:
-            frameX, frameY = self.WALKING[walking_pointer]
-        walking_pointer = (walking_pointer + 1) % len(self.WALKING)
+            frameX, frameY = self.WALKING[int(walking_pointer)]
+        walking_pointer = (walking_pointer + 0.2) % len(self.WALKING)
         return frameX, frameY, walking_pointer
 
 # | TUX JUMP STATE

@@ -65,13 +65,13 @@ class Agent(pygame.sprite.Sprite):
         if len(platform_hit_list) > 0 or self.rect.bottom >= self.HEIGHT:
             self.change_y = -10
     
-    def move(self, direction):
+    def move(self, direction, change_x):
         """ Move agent. """
         self.direction = direction
         if direction == Directions.LEFT:
-            self.change_x = -6
+            self.change_x = change_x*-1
         elif direction == Directions.RIGHT:
-            self.change_x = 6
+            self.change_x = change_x
           
     def update(self, x, y ,frameX, frameY, cell_size=(CELL_SIZE,CELL_SIZE)):
         """ Update Agent's sprite. """
