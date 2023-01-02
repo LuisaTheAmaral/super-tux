@@ -4,6 +4,7 @@ from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
 from coin import Coin
+from monster import Spawner, Snowball
 
 class Level():
 
@@ -35,6 +36,9 @@ class Level():
         wood_platforms = []
         flying_platforms = []
         flying_platforms_limits = []
+        
+        spawner = Spawner()
+        snowbal = Snowball(1, 1, width, height, self.scale) # temp location
 
         for y in range(height):      
             for x in range(width):   
@@ -48,6 +52,12 @@ class Level():
                     wood_platforms.append(coords)
                 elif hex_code == Tiles.TUX.value:
                     self.player_start_position = (x, y)
+                elif hex_code == Tiles.ENEMY_FACED_RIGHT.value:
+                    snowball = spawner.spawn_enemy(snowbal, x, y-1.5, is_right=1)
+                    self.add_enemy(snowball)
+                elif hex_code == Tiles.ENEMY_FACED_LEFT.value:
+                    snowball = spawner.spawn_enemy(snowbal, x, y-1.5, is_right=0)
+                    self.add_enemy(snowball)
                 elif hex_code == Tiles.GOAL.value:
                     self.goal_list.add(Goal(x, y, self.scale))
                 elif hex_code == Tiles.HOME.value:
@@ -58,6 +68,7 @@ class Level():
                     flying_platforms_limits.append(coords)
                 elif hex_code == Tiles.COIN.value:
                     self.coin_list.add(Coin(x*self.scale, y*self.scale))
+            
 
         def _get_platform_details(group):
             x, y = min(group)

@@ -98,14 +98,13 @@ TRANSITIONS = {
 }
 
 class Enemy(Agent):
-    def __init__(self, name, width, height, scale) -> None:
-        super().__init__(name, width, height, scale)
+    def __init__(self, name, width, height, scale, direction) -> None:
+        super().__init__(name, width, height, scale, direction)
         self.width = width
         self.height = height
         self.scale = scale
         self.name = name
-        self.direction = Directions.LEFT
-        self.direction_auto = Directions.LEFT
+        self.direction_auto = self.direction
         
         # state machine responsible for tux in big or mini
         self.fsm = FSM(STATES, TRANSITIONS)
@@ -159,8 +158,8 @@ class Enemy(Agent):
         
     
 class Snowball(Enemy):
-    def __init__(self, initial_x, initial_y, width, height, scale) -> None:
-        super().__init__("snowball", width, height, scale)
+    def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
+        super().__init__("snowball", width, height, scale, direction)
         # load snowball spritesheet
         self.sheet = SpriteSheet("sprites/spritesheet_enemy.png")
         self.cellsize = 50
@@ -168,13 +167,16 @@ class Snowball(Enemy):
         self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
         self.rect = self.image.get_rect()
         
+        #if initial_x!=None and initial_y!=None:
         self.set_start_position(initial_x, initial_y) #set player initial  position 
         
-    def clone(self, initial_x, initial_y) -> Enemy:
-        return Snowball(initial_x, initial_y, self.width, self.height, self.scale)
+    def clone(self, initial_x, initial_y, direction) -> Enemy:
+        return Snowball(initial_x, initial_y, self.width, self.height, self.scale, direction)
  
 class Spawner:
-    def spawn_enemy(self, prototype, initial_x, initial_y) -> Enemy:
-        return prototype.clone(initial_x, initial_y)
+    def spawn_enemy(self, prototype, initial_x, initial_y, is_right=0) -> Enemy:
+        if is_right:
+            return prototype.clone(initial_x, initial_y, Directions.RIGHT)
+        return prototype.clone(initial_x, initial_y, Directions.LEFT)
         
  

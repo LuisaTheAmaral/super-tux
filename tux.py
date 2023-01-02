@@ -171,7 +171,7 @@ TRANSITIONS_BIG = {
 
 class Tux(Agent):
     def __init__(self, name, initial_x, initial_y, width, height, scale):
-        super().__init__(name, width, height, scale)
+        super().__init__(name, width, height, scale, Directions.RIGHT)
         # load mini tux sheet
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
         
@@ -311,9 +311,10 @@ class Tux(Agent):
                         else:
                             # enemy has been killed - notify enemy
                             #ev = pygame.event.Event(ENEMY_KILLED)
+                            print("enemy has been hit")
                             ev = pygame.event.Event(ENEMY_KILLED, {"enemy": enemy})
                             pygame.event.post(ev)
-                break
+            
             
         # See tux hit anything (platforms)
         frameX, frameY, idle = super().collisions(frameX,frameY)
@@ -327,6 +328,7 @@ class Tux(Agent):
     def been_hit(self):
         """ Tux has been hit. """
         if not self.tux_size:
+            print("TUX is dead")
             self.fsm_main.update(Event.DIE, self)
         else:
             self.fsm_main.update(Event.SHRINK, self)

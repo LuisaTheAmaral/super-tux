@@ -8,7 +8,7 @@ from enum import Enum
 CELL_SIZE = 50
 
 class Agent(pygame.sprite.Sprite):
-    def __init__(self, name, width, height, scale):
+    def __init__(self, name, width, height, scale, direction):
         super().__init__()
         self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
@@ -17,7 +17,7 @@ class Agent(pygame.sprite.Sprite):
         self.dead = False
 
         self.walking_pointer = 0
-        self.direction = Directions.LEFT
+        self.direction = direction
 
         self.HEIGHT = height*self.scale
         self.WIDTH = width*self.scale

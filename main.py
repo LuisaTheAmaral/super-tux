@@ -44,23 +44,11 @@ def main(width, height, scale):
     player = Tux("Tux", x, y, width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_g)
     
-    spawner = Spawner()
-    
-    snowbal = Snowball(x+27, y-4, width, height, scale) # temp location
-    
-    snowball = spawner.spawn_enemy(snowbal, x+27, y-4)
-    current_level.add_enemy(snowball)
-    
-    snowball = spawner.spawn_enemy(snowbal, x+28, y-13)
-    
-    current_level.add_enemy(snowball)
-    
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
  
     active_sprite_list.add(player)
     active_sprite_list.add(scoreboard)
-    # active_sprite_list.add(snowball)
  
     # Loop until the user clicks the close button.
     done = False
