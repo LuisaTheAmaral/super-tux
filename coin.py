@@ -14,8 +14,7 @@ class Coin(pygame.sprite.Sprite):
         self.image.blit( self.sheet, ( 0, 0 ) )
         
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y - 15
+        self.rect.center = (x, y)
 
     def update(self):
         self.image.fill("white")

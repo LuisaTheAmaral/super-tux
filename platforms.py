@@ -78,8 +78,7 @@ class FlyingPlatform(pygame.sprite.Sprite):
         self.sheet = SpriteSheet(self.sheets[self.sheet_pointer]).sheet
         self.image.blit( self.sheet, ( 0, 0 ) )
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.center = (x, y)
         self.direction = 1
 
 
