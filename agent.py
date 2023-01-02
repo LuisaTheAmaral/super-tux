@@ -3,6 +3,7 @@ from spritesheet import SpriteSheet
 from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
 import logging
 from enum import Enum
+from platforms import FlyingPlatform
 
 # Global constants
 CELL_SIZE = 50
@@ -93,16 +94,17 @@ class Agent(pygame.sprite.Sprite):
         idle = 0
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
+            if not isinstance(block,FlyingPlatform):
             # If we are moving right,
             # set our right side to the left side of the item we hit
-            if self.change_x > 0:
-                self.rect.right = block.rect.left
-                self.direction_auto = Directions.LEFT
-                    
-            elif self.change_x < 0:
-                # Otherwise if we are moving left, do the opposite
-                self.rect.left = block.rect.right
-                self.direction_auto = Directions.RIGHT
+                if self.change_x > 0:
+                    self.rect.right = block.rect.left
+                    self.direction_auto = Directions.LEFT
+                        
+                elif self.change_x < 0:
+                    # Otherwise if we are moving left, do the opposite
+                    self.rect.left = block.rect.right
+                    self.direction_auto = Directions.RIGHT
  
         # Move up/down
         self.rect.y += self.change_y

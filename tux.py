@@ -288,7 +288,6 @@ class Tux(Agent):
     
     def collisions(self, frameX, frameY):
         """ Verify collisions of tux with platforms and enemies. """
-        
         # kill tux if he is on the bottom of the screen
         if not self.tux_size and self.rect.y == 550:
             self.fsm_main.update(Event.DIE, self)
@@ -298,21 +297,17 @@ class Tux(Agent):
             return frameX, frameY
         
         # verify if tux has colided with any enemy
-        #block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
-        
-        for enemy in self.level.enemy_list:
-            if not enemy.dead:
-                block_hit_list = pygame.sprite.spritecollide(self, [enemy], False)
-                for block in block_hit_list:
-                    if self.change_x < 10 and self.change_y > 0:
-                        if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
-                            # tux has been hit
-                            self.been_hit()
-                        elif enemy.is_smashable():
-                            # enemy has been killed - notify enemy
-                            print("enemy has been hit")
-                            ev = pygame.event.Event(ENEMY_KILLED, {"enemy": enemy})
-                            pygame.event.post(ev)
+        block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
+        for block in block_hit_list:
+            if not block.dead and self.change_x < 10 and self.change_y > 0:
+                if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
+                    # tux has been hit
+                    self.been_hit()
+                elif block.is_smashable():
+                    # enemy has been killed - notify enemy
+                    print("enemy has been hit")
+                    ev = pygame.event.Event(ENEMY_KILLED, {"enemy": block})
+                    pygame.event.post(ev)
             
             
         # See tux hit anything (platforms)

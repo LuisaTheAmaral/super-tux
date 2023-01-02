@@ -141,8 +141,8 @@ class Level():
         """ Draw everything on this level. """ 
         self.coin_list.draw(screen)
         self.platform_list.draw(screen)
-        self.enemy_list.draw(screen)
         self.goal_list.draw(screen)
+        self.enemy_list.draw(screen)
         
  
     def shift_world(self, shift_x):
