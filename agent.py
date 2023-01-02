@@ -46,7 +46,7 @@ class Agent(pygame.sprite.Sprite):
             self.change_y = 1
         else:
             self.change_y += .35
- 
+
         # See if we are on the ground
         if self.rect.y >= self.HEIGHT - self.rect.height and self.change_y >= 0:
             self.change_y = 0

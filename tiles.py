@@ -8,3 +8,6 @@ class Tiles(Enum):
     TUX = "1a237e"
     HOME = "616161"
     GOAL = "3e2723"
+    FLYING_PLATFORM_LIMIT = "ffcc80"
+    FLYING_PLATFORM = "ff9800"
+    COIN = "ffff00"

@@ -197,11 +197,10 @@ class Tux(Agent):
         
     def grow_toggle(self, previous):
         """ Changes tux size. """
-        # print("\ngrow toggle")
-        # print(self.tux_size)
+        
+        tmp = self.rect
         if not self.tux_size:
             # if tux is mini change to big tux
-            tmp = self.rect
             self.fsm_main = self.fsm_max
             self.sheet = SpriteSheet("sprites/spritesheet_big_full.png")
             frameX, frameY = (0, 3)
@@ -214,7 +213,6 @@ class Tux(Agent):
             self.tux_size = 1
         else:
             # if tux is big change to mini tux
-            tmp = self.rect
             self.fsm_main = self.fsm_mini
             self.sheet = SpriteSheet("sprites/spritesheet_full.png")
             frameX, frameY = (0, 3)
