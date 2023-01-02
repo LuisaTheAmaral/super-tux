@@ -111,6 +111,9 @@ class Enemy(Agent):
         
     def clone(self):
         return NotImplemented
+    
+    def is_smashable(self):
+        return 1
         
     # move enemy automatically
     def commands(self, dead=0):
@@ -161,17 +164,37 @@ class Snowball(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
         super().__init__("snowball", width, height, scale, direction)
         # load snowball spritesheet
-        self.sheet = SpriteSheet("sprites/spritesheet_enemy.png")
+        self.sheet = SpriteSheet("sprites/spritesheet_snowball.png")
         self.cellsize = 50
         frameX, frameY = (1, 0)
         self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
         self.rect = self.image.get_rect()
         
-        #if initial_x!=None and initial_y!=None:
         self.set_start_position(initial_x, initial_y) #set player initial  position 
         
     def clone(self, initial_x, initial_y, direction) -> Enemy:
         return Snowball(initial_x, initial_y, self.width, self.height, self.scale, direction)
+    
+    def is_smashable(self):
+        return 1
+    
+class Spiky(Enemy):
+    def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
+        super().__init__("snowball", width, height, scale, direction)
+        # load snowball spritesheet
+        self.sheet = SpriteSheet("sprites/spritesheet_spiky.png")
+        self.cellsize = 50
+        frameX, frameY = (1, 0)
+        self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
+        self.rect = self.image.get_rect()
+        
+        self.set_start_position(initial_x, initial_y) #set player initial  position 
+        
+    def clone(self, initial_x, initial_y, direction) -> Enemy:
+        return Spiky(initial_x, initial_y, self.width, self.height, self.scale, direction)
+    
+    def is_smashable(self):
+        return 0
  
 class Spawner:
     def spawn_enemy(self, prototype, initial_x, initial_y, is_right=0) -> Enemy:

@@ -308,9 +308,8 @@ class Tux(Agent):
                         if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
                             # tux has been hit
                             self.been_hit()
-                        else:
+                        elif enemy.is_smashable():
                             # enemy has been killed - notify enemy
-                            #ev = pygame.event.Event(ENEMY_KILLED)
                             print("enemy has been hit")
                             ev = pygame.event.Event(ENEMY_KILLED, {"enemy": enemy})
                             pygame.event.post(ev)

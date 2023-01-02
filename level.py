@@ -4,7 +4,7 @@ from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
 from coin import Coin
-from monster import Spawner, Snowball
+from monster import Spawner, Snowball, Spiky
 
 class Level():
 
@@ -38,7 +38,8 @@ class Level():
         flying_platforms_limits = []
         
         spawner = Spawner()
-        snowbal = Snowball(1, 1, width, height, self.scale) # temp location
+        snowball_prototype = Snowball(1, 1, width, height, self.scale) # temp location
+        spiky_prototype = Spiky(1, 1, width, height, self.scale) # temp location
 
         for y in range(height):      
             for x in range(width):   
@@ -52,12 +53,18 @@ class Level():
                     wood_platforms.append(coords)
                 elif hex_code == Tiles.TUX.value:
                     self.player_start_position = (x, y)
-                elif hex_code == Tiles.ENEMY_FACED_RIGHT.value:
-                    snowball = spawner.spawn_enemy(snowbal, x, y-1.5, is_right=1)
+                elif hex_code == Tiles.SNOWBALL_FACED_RIGHT.value:
+                    snowball = spawner.spawn_enemy(snowball_prototype, x, y-1.5, is_right=1)
                     self.add_enemy(snowball)
-                elif hex_code == Tiles.ENEMY_FACED_LEFT.value:
-                    snowball = spawner.spawn_enemy(snowbal, x, y-1.5, is_right=0)
+                elif hex_code == Tiles.SNOWBALL_FACED_LEFT.value:
+                    snowball = spawner.spawn_enemy(snowball_prototype, x, y-1.5, is_right=0)
                     self.add_enemy(snowball)
+                elif hex_code == Tiles.SPIKY_FACED_RIGHT.value:
+                    spiky = spawner.spawn_enemy(spiky_prototype, x, y-1.5, is_right=1)
+                    self.add_enemy(spiky)
+                elif hex_code == Tiles.SPIKY_FACED_LEFT.value:
+                    spiky = spawner.spawn_enemy(spiky_prototype, x, y-1.5, is_right=0)
+                    self.add_enemy(spiky)
                 elif hex_code == Tiles.GOAL.value:
                     self.goal_list.add(Goal(x, y, self.scale))
                 elif hex_code == Tiles.HOME.value:
@@ -115,8 +122,8 @@ class Level():
         """ Update everything in this level."""
         self.coin_list.update()
         self.platform_list.update()
-        self.enemy_list.update()
         self.goal_list.update()
+        self.enemy_list.update()
         
     def send_enemy_commands(self):
         """ Send command to all enemies."""
