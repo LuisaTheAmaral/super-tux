@@ -29,6 +29,10 @@ class Right(Command):
     def __init__(self) -> None:
         pass
     
+class Size_Up(Command):
+    def __init__(self) -> None:
+        pass 
+    
 class Stop(Command):
     def __init__(self) -> None:
         pass

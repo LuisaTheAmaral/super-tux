@@ -5,7 +5,7 @@ class State:
         self.name = name
 
     def enter(self):
-        print(f"Entering {self.name}")
+        pass
 
     def update(self, previous):
         pass

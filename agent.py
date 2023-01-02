@@ -1,6 +1,6 @@
 import pygame 
 from spritesheet import SpriteSheet
-from common import Directions, Up, Left, Down, Right, ALPHA
+from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
 import logging
 from enum import Enum
 
@@ -8,7 +8,7 @@ from enum import Enum
 CELL_SIZE = 50
 
 class Agent(pygame.sprite.Sprite):
-    def __init__(self, name, initial_x, initial_y, width, height, scale):
+    def __init__(self, name, width, height, scale):
         super().__init__()
         self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
@@ -17,12 +17,7 @@ class Agent(pygame.sprite.Sprite):
         self.dead = False
 
         self.walking_pointer = 0
-        self.direction = Directions.RIGHT
-        frameX, frameY = (0, 3) # idle coords
-        
-        self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
-        self.rect = self.image.get_rect()
-        self.set_start_position(initial_x, initial_y) #set player initial  position 
+        self.direction = Directions.LEFT
 
         self.HEIGHT = height*self.scale
         self.WIDTH = width*self.scale
@@ -37,12 +32,13 @@ class Agent(pygame.sprite.Sprite):
     def set_start_position(self, x, y):
         self.rect.x, self.rect.y = x*self.scale, y*self.scale
 
-    def controls(self, up, left, down, right):
+    def controls(self, up, left, down, right, grow):
         self.control_keys = {
             up: Up, 
             left: Left, 
             down: Down, 
-            right: Right}
+            right: Right, 
+            grow: Size_Up}
  
     def calc_grav(self):
         """ Calculate effect of gravity. """
@@ -68,16 +64,17 @@ class Agent(pygame.sprite.Sprite):
         # If it is ok to jump, set our speed upwards
         if len(platform_hit_list) > 0 or self.rect.bottom >= self.HEIGHT:
             self.change_y = -10
- 
-    # Player-controlled movement:
+    
     def move(self, direction):
+        """ Move agent. """
         self.direction = direction
         if direction == Directions.LEFT:
             self.change_x = -6
         elif direction == Directions.RIGHT:
             self.change_x = 6
-            
-    def update(self, x, y ,frameX, frameY):
+          
+    def update(self, x, y ,frameX, frameY, cell_size=(CELL_SIZE,CELL_SIZE)):
+        """ Update Agent's sprite. """
         # Gravity
         self.calc_grav()
  
@@ -87,10 +84,11 @@ class Agent(pygame.sprite.Sprite):
         # verify collisions
         frameX, frameY = self.collisions(frameX, frameY)
 
-        self.image = self.sheet.image_at((frameX * CELL_SIZE, frameY * CELL_SIZE, CELL_SIZE, CELL_SIZE), colorkey=ALPHA)
+        self.image = self.sheet.image_at((frameX * cell_size[0], frameY * cell_size[1], cell_size[0], cell_size[1]), colorkey=ALPHA)
         
-            
+     
     def collisions(self, frameX, frameY):
+        """ Verify collisions of agent with platforms. """
         # See if we hit anything
         idle = 0
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
@@ -99,18 +97,12 @@ class Agent(pygame.sprite.Sprite):
             # set our right side to the left side of the item we hit
             if self.change_x > 0:
                 self.rect.right = block.rect.left
-                try:
-                    self.direction_auto = Directions.LEFT
-                except:
-                    pass
+                self.direction_auto = Directions.LEFT
                     
             elif self.change_x < 0:
                 # Otherwise if we are moving left, do the opposite
                 self.rect.left = block.rect.right
-                try:
-                    self.direction_auto = Directions.RIGHT
-                except:
-                    pass
+                self.direction_auto = Directions.RIGHT
  
         # Move up/down
         self.rect.y += self.change_y
@@ -118,6 +110,13 @@ class Agent(pygame.sprite.Sprite):
         # Check and see if we hit anything
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
+ 
+            # if enemy is on the edge of the platform change direction 
+            if self.rect.centerx+20 >= block.rect.right:
+                self.direction_auto = Directions.LEFT
+                
+            elif self.rect.centerx-20 < block.rect.left:
+                self.direction_auto = Directions.RIGHT
  
             # Reset our position based on the top/bottom of the object
             if self.change_y > 0:
@@ -139,5 +138,6 @@ class Agent(pygame.sprite.Sprite):
         self.change_x = 0
 
     def kill(self):
+        """ Kill agent. """
         logging.info("Agent died")
         self.dead = True

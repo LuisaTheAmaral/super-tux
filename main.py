@@ -3,7 +3,7 @@ from pygame.locals import *
 import math
 from agent import Agent
 from level import Level 
-from tux import Tux
+from tux import Tux, ENEMY_KILLED, TUX_DEAD
 from monster import Snowball
  
 def main(width, height, scale):
@@ -26,7 +26,6 @@ def main(width, height, scale):
  
     pygame.display.set_caption("Tux")
  
-
     # Create all the levels
     level_list = []
     level_list.append(Level("levels/level1.png", scale=scale))
@@ -40,23 +39,25 @@ def main(width, height, scale):
     # Create the player
     x, y = current_level.player_start_position
     player = Tux("Tux", x, y, width, height, scale)
-    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT)
+    player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_g)
     
-    # snowball = Snowball(50, 50, width, height, scale) # temp location
- 
+    snowball = Snowball(x+27, y-4, width, height, scale) # temp location
+    
+    current_level.add_enemy(snowball)
+    
     active_sprite_list = pygame.sprite.Group()
     player.level = current_level
-    # snowball.level = current_level
+    snowball.level = current_level
  
     active_sprite_list.add(player)
-    # active_sprite_list.add(snowball)
  
     # Loop until the user clicks the close button.
     done = False
  
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
- 
+    
+    dead_event=0
     # -------- Main Program Loop -----------
     while not done:
         # fill background with image
@@ -64,35 +65,29 @@ def main(width, height, scale):
             screen.blit(bg, (i*bg_width+scroll,0))
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                player.kill()
+            # if tux is dead end game
+            if event.type == pygame.QUIT or event.type == TUX_DEAD:
                 done = True
- 
+              
+            # enemy has been killed  
+            if event.type == ENEMY_KILLED: 
+                dead_event = 1
+                    
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    cmd = player.commands(pygame.K_LEFT)
-                    if cmd:
-                        command_log.append(cmd)
-                if event.key == pygame.K_RIGHT:
-                    cmd = player.commands(pygame.K_RIGHT)
-                    if cmd:
-                        command_log.append(cmd)
-                if event.key == pygame.K_SPACE:
-                    cmd = player.commands(pygame.K_SPACE)
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE, pygame.K_g):
+                    cmd = player.commands(event.key)
                     if cmd:
                         command_log.append(cmd)
  
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT and player.change_x < 0:
+                if (event.key == pygame.K_LEFT and player.change_x < 0) or (event.key == pygame.K_RIGHT and player.change_x > 0):
                     cmd = player.commands(None)
                     if cmd:
                         command_log.append(cmd)
-                    
-                if event.key == pygame.K_RIGHT and player.change_x > 0:
-                    cmd = player.commands(None)
-                    if cmd:
-                        command_log.append(cmd)
-                    
+        
+        # send command to enemy
+        snowball.commands(dead_event)
+        
         # Update the player
         active_sprite_list.update()
  
@@ -124,7 +119,7 @@ def main(width, height, scale):
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
-                # snowball.level = current_level
+                snowball.level = current_level
                 x, y = current_level.player_start_position
                 player.set_start_position(x, y)
  
@@ -132,7 +127,7 @@ def main(width, height, scale):
         active_sprite_list.draw(screen)
  
         # Limit to 60 frames per second
-        clock.tick(60)
+        clock.tick(50)
         for cmd in command_log:
             print(cmd)
             command_log.remove(cmd) #reduces cmd print spam

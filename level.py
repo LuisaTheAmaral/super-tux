@@ -20,6 +20,9 @@ class Level():
         self.coords = []
 
         self.parse_level_file()
+        
+    def add_enemy(self, enemy):
+        self.enemy_list.add(enemy)
 
     def parse_level_file(self):
         img = Image.open(self.filename)
