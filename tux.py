@@ -1,6 +1,6 @@
 import pygame 
 from spritesheet import SpriteSheet
-from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
+from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA, ENEMY_KILLED, TUX_DEAD, CATCH_COIN, Subject
 import logging
 from fsm import FSM, State, Transition
 from enum import Enum
@@ -11,8 +11,6 @@ CELL_SIZE = 50
 CELL_SIZE_w = 64
 CELL_SIZE_h = 80
 
-ENEMY_KILLED = pygame.event.custom_type()
-TUX_DEAD = pygame.event.custom_type()
 
 # TUX STATES  
 class Event(Enum):
@@ -169,9 +167,10 @@ TRANSITIONS_BIG = {
     ]
 }
 
-class Tux(Agent):
+class Tux(Agent, Subject):
     def __init__(self, name, initial_x, initial_y, width, height, scale):
-        super().__init__(name, width, height, scale)
+        Agent.__init__(self, name, width, height, scale)
+        Subject.__init__(self)
         # load mini tux sheet
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
         
@@ -286,16 +285,16 @@ class Tux(Agent):
             return
         
     
-    def collisions(self, frameX, frameY):
+    def collisions(self):
         """ Verify collisions of tux with platforms and enemies. """
         
         # kill tux if he is on the bottom of the screen
         if not self.tux_size and self.rect.y == 550:
             self.fsm_main.update(Event.DIE, self)
-            return frameX, frameY
+            return
         elif self.tux_size and self.rect.y == 520:
             self.fsm_main.update(Event.SHRINK, self)
-            return frameX, frameY
+            return
         
         # verify if tux has colided with any enemy
         block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
@@ -310,17 +309,27 @@ class Tux(Agent):
                         else:
                             # enemy has been killed - notify enemy
                             ev = pygame.event.Event(ENEMY_KILLED)
+                            self.notify(ENEMY_KILLED)
                             pygame.event.post(ev)
                 break
-            
+
+        # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
+        coin_hit_list = pygame.sprite.spritecollide(self, self.level.coin_list, False)
+        for coin in coin_hit_list:
+            self.level.coin_list.remove(coin)
+            self.notify(CATCH_COIN)
+
         # See tux hit anything (platforms)
-        frameX, frameY, idle = super().collisions(frameX,frameY)
+        idle, n_coins = super().collisions()
+        for _ in range(0, n_coins):
+            self.notify(CATCH_COIN)
+            
+        
 
         #making sure that tux changes to idle when he lands on the ground and does not move
         if idle:
             self.fsm_main.update(Event.IDLE, self)
                 
-        return frameX, frameY
     
     def been_hit(self):
         """ Tux has been hit. """

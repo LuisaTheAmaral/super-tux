@@ -37,12 +37,12 @@ def main(width, height, scale):
     current_level_no = 0
     current_level = level_list[current_level_no]
 
-    scoreboard = Scoreboard(SCREEN_WIDTH)
-
     # Create the player
     x, y = current_level.player_start_position
     player = Tux("Tux", x, y, width, height, scale)
     player.controls(pygame.K_SPACE, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_g)
+
+    scoreboard = Scoreboard(SCREEN_WIDTH, player)
     
     snowball = Snowball(x+27, y-4, width, height, scale) # temp location
     
@@ -75,7 +75,7 @@ def main(width, height, scale):
                 done = True
               
             # enemy has been killed  
-            if event.type == ENEMY_KILLED: 
+            if event.type == ENEMY_KILLED:
                 dead_event = 1
                     
             if event.type == pygame.KEYDOWN:
@@ -109,13 +109,7 @@ def main(width, height, scale):
         if player.rect.left <= 120:
             diff = 120 - player.rect.left
             player.rect.left = 120
-            current_level.shift_world(diff)
-
-        # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
-        coin_hit_list = pygame.sprite.spritecollide(player, current_level.coin_list, False)
-        for coin in coin_hit_list:
-            current_level.coin_list.remove(coin)
-            scoreboard.increase_points()
+            current_level.shift_world(diff)        
  
         # If the player gets to the end of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)

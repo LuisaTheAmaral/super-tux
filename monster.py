@@ -116,15 +116,14 @@ class Monster(Agent):
         return None
  
     # verify collisions and update sprite and state if needed
-    def collisions(self, frameX, frameY):
+    def collisions(self):
         # See if we hit anything
-        frameX, frameY, idle = super().collisions(frameX,frameY)
+        idle, _ = super().collisions()
         
         #making sure that monsyter changes to idle when he lands on the ground and does not move
         if idle:
             self.fsm.update(Event.IDLE, self)
                 
-        return frameX, frameY
     
     # update sprite based on state
     def update(self):        

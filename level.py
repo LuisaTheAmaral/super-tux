@@ -4,6 +4,7 @@ from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
 from coin import Coin
+from bonus_block import EggBlock, CoinBlock
 
 class Level():
 
@@ -14,6 +15,7 @@ class Level():
         self.enemy_list = pygame.sprite.Group()
         self.goal_list = pygame.sprite.Group()
         self.coin_list = pygame.sprite.Group()
+        self.blocks_list = pygame.sprite.Group()
         self.level_limit = -1000
         self.player_start_position = (0, 0)
 
@@ -34,6 +36,7 @@ class Level():
         wood_platforms = []
         flying_platforms = []
         flying_platforms_limits = []
+        bonus_blocks = []
 
         for y in range(height):      
             for x in range(width):   
@@ -57,6 +60,10 @@ class Level():
                     flying_platforms_limits.append(coords)
                 elif hex_code == Tiles.COIN.value:
                     self.coin_list.add(Coin(x*self.scale, y*self.scale))
+                elif hex_code == Tiles.COIN_BLOCK.value:
+                    bonus_blocks.append(CoinBlock(x*self.scale, y*self.scale))
+                elif hex_code == Tiles.EGG_BLOCK.value:
+                    bonus_blocks.append(EggBlock(x*self.scale, y*self.scale))
 
         def _get_platform_details(group):
             x, y = min(group)
@@ -97,6 +104,8 @@ class Level():
 
         _define_platforms(snow_platforms, "snow")
         _define_platforms(wood_platforms, "wood")
+        for block in bonus_blocks:
+            self.platform_list.add(block)
         _define_flying_platforms(flying_platforms, flying_platforms_limits)
 
     def update(self):
@@ -105,6 +114,7 @@ class Level():
         self.platform_list.update()
         self.enemy_list.update()
         self.goal_list.update()
+        self.blocks_list.update()
         
  
     def draw(self, screen):
@@ -113,6 +123,7 @@ class Level():
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
         self.goal_list.draw(screen)
+        self.blocks_list.draw(screen)
         
  
     def shift_world(self, shift_x):
@@ -134,3 +145,6 @@ class Level():
 
         for coin in self.coin_list:
             coin.rect.x += shift_x
+
+        for block in self.blocks_list:
+            block.rect.x += shift_x

@@ -3,6 +3,7 @@ from spritesheet import SpriteSheet
 from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
 import logging
 from enum import Enum
+from bonus_block import CoinBlock
 
 # Global constants
 CELL_SIZE = 50
@@ -82,15 +83,16 @@ class Agent(pygame.sprite.Sprite):
         self.rect.x += self.change_x
  
         # verify collisions
-        frameX, frameY = self.collisions(frameX, frameY)
+        self.collisions()
 
         self.image = self.sheet.image_at((frameX * cell_size[0], frameY * cell_size[1], cell_size[0], cell_size[1]), colorkey=ALPHA)
         
      
-    def collisions(self, frameX, frameY):
+    def collisions(self):
         """ Verify collisions of agent with platforms. """
         # See if we hit anything
         idle = 0
+        n_coin_hit = 0
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
             # If we are moving right,
@@ -123,6 +125,10 @@ class Agent(pygame.sprite.Sprite):
                 self.rect.bottom = block.rect.top
             elif self.change_y < 0:
                 self.rect.top = block.rect.bottom
+                if isinstance(block, CoinBlock):
+                    box_broken = block.break_block()
+                    if box_broken:
+                        n_coin_hit += 1
  
             # Stop our vertical movement
             self.change_y = 0
@@ -131,7 +137,7 @@ class Agent(pygame.sprite.Sprite):
         if self.change_y == 0 and self.change_x == 0:
             idle = 1
                 
-        return frameX, frameY, idle
+        return idle, n_coin_hit
  
     def stop(self):
         """ Called when the user lets off the keyboard. """
