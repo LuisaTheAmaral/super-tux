@@ -7,9 +7,9 @@ class Platform(pygame.sprite.Sprite):
  
     def __init__(self, sheets, width, height, x, y):
         super().__init__()
-        
-        x_cursor = 0
-        y_cursor = 0
+
+        self.width = width
+        self.height = height
         
         self.image = pygame.Surface([width, height], pygame.SRCALPHA)
         self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
@@ -20,8 +20,19 @@ class Platform(pygame.sprite.Sprite):
         self.bottom_right_sheet = SpriteSheet(sheets[3]).sheet
         self.top_sheet = SpriteSheet(sheets[4]).sheet
         self.bottom_sheet = SpriteSheet(sheets[5]).sheet
-        
-        while ( y_cursor < height ):
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        self.show_platform()
+
+    def show_platform(self):
+
+        x_cursor = 0
+        y_cursor = 0
+
+        while ( y_cursor < self.height ):
             if y_cursor == 0: #snow
                 self.image.blit( self.top_left_sheet, ( 0, y_cursor ) )
             else: #wall tile
@@ -30,8 +41,8 @@ class Platform(pygame.sprite.Sprite):
             
         y_cursor = 0
         x_cursor = self.bottom_left_sheet.get_width()
-        while ( y_cursor < height ):
-            while ( x_cursor < width-self.top_right_sheet.get_width() ):
+        while ( y_cursor < self.height ):
+            while ( x_cursor < self.width-self.top_right_sheet.get_width() ):
                 if y_cursor == 0: #snow
                     self.image.blit( self.top_sheet, ( x_cursor, y_cursor ) )
                 else: #wall tile
@@ -41,18 +52,14 @@ class Platform(pygame.sprite.Sprite):
             x_cursor = self.bottom_left_sheet.get_width()
         
         y_cursor = 0
-        x_cursor = width-self.bottom_right_sheet.get_width()
-        while ( y_cursor < height ):
+        x_cursor = self.width-self.bottom_right_sheet.get_width()
+        while ( y_cursor < self.height ):
             if y_cursor == 0: #snow
                 self.image.blit( self.top_right_sheet, ( x_cursor, y_cursor ) )
             else: #wall tile
                 self.image.blit( self.bottom_right_sheet, ( x_cursor, y_cursor ) )
             y_cursor += self.bottom_right_sheet.get_height()
         
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
 class WoodPlatform(Platform):
     def __init__(self, width, height, x, y):
         sheets = [f"assets/blocks/wood_{x}.png" for x in range(1,7)]
@@ -62,6 +69,7 @@ class SnowPlatform(Platform):
     def __init__(self, width, height, x, y):
         sheets = [f"assets/blocks/snow_{x}.png" for x in range(1,7)]
         super().__init__(sheets, width, height, x, y)
+
 
 class FlyingPlatform(pygame.sprite.Sprite):
     def __init__(self, x, y, y_min_limit, y_max_limit):
