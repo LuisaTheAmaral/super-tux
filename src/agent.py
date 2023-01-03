@@ -13,7 +13,7 @@ class Agent(pygame.sprite.Sprite):
     def __init__(self, name, width, height, scale, direction):
         super().__init__()
         self.name = name
-        self.sheet = SpriteSheet("sprites/spritesheet_full.png")
+        self.sheet = SpriteSheet("assets/creatures/spritesheet_full.png")
         self.scale = scale
         self.control_keys = {}
         self.dead = False

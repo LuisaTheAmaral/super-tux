@@ -44,6 +44,6 @@ class Scoreboard(pygame.sprite.Sprite):
     def update(self):
         self.image.fill("blue")
         self.image.set_colorkey("blue")
-        self.show_score(self.scores["points"], "assets/coin/coin-0.png")
+        self.show_score(self.scores["points"], "assets/scoreboard/coin.png")
         self.show_score(self.scores["enemies"], "assets/scoreboard/enemy.png", y=20)
         

@@ -163,7 +163,7 @@ class Snowball(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
         super().__init__("snowball", width, height, scale, direction)
         # load snowball spritesheet
-        self.sheet = SpriteSheet("sprites/spritesheet_snowball.png")
+        self.sheet = SpriteSheet("assets/creatures/spritesheet_snowball.png")
         self.cellsize = 50
         frameX, frameY = (1, 0)
         self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
@@ -181,7 +181,7 @@ class Spiky(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
         super().__init__("snowball", width, height, scale, direction)
         # load snowball spritesheet
-        self.sheet = SpriteSheet("sprites/spritesheet_spiky.png")
+        self.sheet = SpriteSheet("assets/creatures/spritesheet_spiky.png")
         self.cellsize = 50
         frameX, frameY = (1, 0)
         self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)

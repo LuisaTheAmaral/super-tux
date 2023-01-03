@@ -128,9 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-sprites/official
-assets/media-master
-assets/media-master.zip
 .vscode/launch.json
-assets/snow/
 drafts/

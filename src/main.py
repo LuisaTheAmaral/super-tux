@@ -30,9 +30,9 @@ def main(width, height, scale):
  
     # Create all the levels
     level_list = []
-    level_list.append(Level("levels/level1.png", height=height, scale=scale))
-    level_list.append(Level("levels/level2.png", height=height, scale=scale))
-    level_list.append(Level("levels/level3.png", height=height, scale=scale))
+    level_list.append(Level("assets/levels/level1.png", height=height, scale=scale))
+    level_list.append(Level("assets/levels/level2.png", height=height, scale=scale))
+    level_list.append(Level("assets/levels/level3.png", height=height, scale=scale))
  
     # Set the current level
     current_level_no = 0
