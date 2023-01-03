@@ -321,7 +321,6 @@ class Tux(Agent, Subject):
     def been_hit(self):
         """ Tux has been hit. """
         if not self.tux_size:
-            print("TUX is dead")
             self.fsm_main.update(Event.DIE, self)
         else:
             self.fsm_main.update(Event.SHRINK, self)
