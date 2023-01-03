@@ -6,6 +6,7 @@ from level import Level
 from tux import Tux, ENEMY_KILLED, TUX_DEAD
 from monster import Snowball, Spawner
 from scoreboard import Scoreboard
+from common import YELLOW, BLACK
  
 def main(width, height, scale):
     """ Main Program """
@@ -116,12 +117,43 @@ def main(width, height, scale):
         # If the player gets to the end of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
         if block_hit_list:
-            print(f"LEVEL {current_level_no+1} COMPLETED")
+            msg = f"LEVEL {current_level_no+1} COMPLETED. PRESS ENTER TO CONTINUE"
+            command_log.append(f"LEVEL {current_level_no+1} COMPLETED")
             if current_level_no == len(level_list) - 1:
                 player.kill()
                 done = True
-            player.stop() #temporary
+                msg = f"LEVEL {current_level_no+1} COMPLETED. GAME FINISHED"
+                command_log.append(f"GAME COMPLETED")
+            player.stop()
 
+            #show continue screen
+            pygame.display.flip()
+            
+            font = pygame.font.Font('assets/SuperTux-Medium.ttf', 32)
+            shadow_offset = 2
+                    
+            text = font.render(msg, True, YELLOW)
+            textRect = text.get_rect()
+            textRect.center = (width*scale // 2, height*scale // 4)
+            
+            shadow = font.render(msg, True, BLACK)
+            shadowRect = shadow.get_rect()
+            shadowRect.center = (width*scale // 2, height*scale // 4 + shadow_offset)
+            
+            screen.blit(shadow, shadowRect)
+            screen.blit(text, textRect)
+            pygame.display.update()
+            
+            next_level = False
+            while not next_level:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            next_level = True
+                            break
+                
         # current_position = player.rect.x + current_level.world_shift
         # if current_position < current_level.level_limit:
         #     player.rect.x = 120
@@ -133,8 +165,9 @@ def main(width, height, scale):
                 x, y = current_level.player_start_position
                 player.set_start_position(x, y)
  
-        current_level.draw(screen)
-        active_sprite_list.draw(screen)
+        if not done:
+            current_level.draw(screen)
+            active_sprite_list.draw(screen)
  
         # Limit to 60 frames per second
         clock.tick(50)

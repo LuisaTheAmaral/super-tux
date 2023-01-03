@@ -7,6 +7,8 @@ ENEMY_KILLED = pygame.event.custom_type()
 TUX_DEAD = pygame.event.custom_type()
 
 ALPHA = (0, 255, 0)
+YELLOW = (255, 255, 0)
+BLACK = (0, 0, 0)
 
 class Subject:
 

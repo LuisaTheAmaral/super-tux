@@ -1,9 +1,6 @@
 import pygame
 from spritesheet import SpriteSheet
-from common import CATCH_COIN, ENEMY_KILLED
-
-YELLOW = (255, 255, 0)
-BLACK = (0, 0, 0)
+from common import CATCH_COIN, ENEMY_KILLED, YELLOW, BLACK
 
 class Scoreboard(pygame.sprite.Sprite):
 

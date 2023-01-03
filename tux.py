@@ -304,6 +304,7 @@ class Tux(Agent, Subject):
                     # enemy has been killed - notify enemy
                     ev = pygame.event.Event(ENEMY_KILLED, {"enemy": block})
                     pygame.event.post(ev)
+                    self.notify(ENEMY_KILLED)
 
         # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
         coin_hit_list = pygame.sprite.spritecollide(self, self.level.coin_list, False)
