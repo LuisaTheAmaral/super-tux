@@ -140,7 +140,7 @@ def main(width, height, scale):
         clock.tick(50)
         for cmd in command_log:
             print(cmd)
-            command_log.remove(cmd) #reduces cmd print spam
+            # command_log.remove(cmd) #reduces cmd print spam
  
         # update the screen
         pygame.display.flip()

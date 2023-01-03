@@ -5,6 +5,7 @@ import logging
 from fsm import FSM, State, Transition
 from enum import Enum
 from agent import Agent
+from datetime import datetime
 
 # Global constants
 CELL_SIZE = 50
@@ -231,7 +232,7 @@ class Tux(Agent, Subject):
     def commands(self, control):
         """ Receives commands from input and changes state of tux based on them. """
         c_event = Event.IDLE
-        
+        msg = None
         if control in self.control_keys.keys():
             cmd = self.control_keys[control]()
             
@@ -239,17 +240,19 @@ class Tux(Agent, Subject):
                 c_event = Event.WALK
                 self.direction = Directions.RIGHT
                 self.fsm_main.update(c_event, self, dir=Directions.RIGHT)   
-                return
+                return f"[{datetime.now()}] {self.name}: {Directions.RIGHT}"
             elif isinstance(cmd,Left):
                 c_event = Event.WALK
                 self.direction = Directions.LEFT
                 self.fsm_main.update(c_event, self, dir=Directions.LEFT)
-                return
+                return f"[{datetime.now()}] {self.name}: {Directions.LEFT}"
             elif isinstance(cmd,Up):
                 c_event = Event.JUMP
+                msg = f"[{datetime.now()}] {self.name}: {Directions.UP}"
 
         self.fsm_main.update(c_event, self)
-        return None
+        
+        return msg
  
     def update(self):
         # Get body
