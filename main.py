@@ -29,9 +29,9 @@ def main(width, height, scale):
  
     # Create all the levels
     level_list = []
-    level_list.append(Level("levels/level1.png", scale=scale))
-    level_list.append(Level("levels/level2.png", scale=scale))
-    level_list.append(Level("levels/level3.png", scale=scale))
+    level_list.append(Level("levels/level1.png", height=height, scale=scale))
+    level_list.append(Level("levels/level2.png", height=height, scale=scale))
+    level_list.append(Level("levels/level3.png", height=height, scale=scale))
  
     # Set the current level
     current_level_no = 0
@@ -79,7 +79,7 @@ def main(width, height, scale):
                 dead_event = 1
                     
             if event.type == pygame.KEYDOWN:
-                if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE, pygame.K_g):
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE):
                     cmd = player.commands(event.key)
                     if cmd:
                         command_log.append(cmd)
@@ -109,7 +109,14 @@ def main(width, height, scale):
         if player.rect.left <= 120:
             diff = 120 - player.rect.left
             player.rect.left = 120
-            current_level.shift_world(diff)        
+            current_level.shift_world(diff)   
+
+        # If the player gets to the end of the level, go to the next level
+        block_hit_list = pygame.sprite.spritecollide(player, current_level.powers, False)
+        for power in block_hit_list:
+            power.deactivate()
+            current_level.powers.remove(power)
+            player.grow_toggle()  
  
         # If the player gets to the end of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)

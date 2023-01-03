@@ -118,7 +118,7 @@ class Monster(Agent):
     # verify collisions and update sprite and state if needed
     def collisions(self):
         # See if we hit anything
-        idle, _ = super().collisions()
+        idle, _, _ = super().collisions()
         
         #making sure that monsyter changes to idle when he lands on the ground and does not move
         if idle:

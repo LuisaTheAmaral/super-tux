@@ -103,7 +103,7 @@ class Grow(State):
 
     # change active state machine to big tux
     def update(self, object, dir, previous):
-        object.grow_toggle(previous)
+        object.grow_toggle()
     
 # | TUX DIE STATE
 class Die(State):
@@ -128,7 +128,7 @@ class Shrink(State):
 
     # change active state machine to mini tux
     def update(self, object, dir, previous):
-        object.grow_toggle(previous)
+        object.grow_toggle()
         
 
 STATES_MINI = [Idle, Walk, Jump, Grow, Die]
@@ -194,7 +194,7 @@ class Tux(Agent, Subject):
         # main state machine
         self.fsm_main = self.fsm_mini
         
-    def grow_toggle(self, previous):
+    def grow_toggle(self):
         """ Changes tux size. """
         
         tmp = self.rect
@@ -247,11 +247,6 @@ class Tux(Agent, Subject):
                 return
             elif isinstance(cmd,Up):
                 c_event = Event.JUMP
-            elif isinstance(cmd,Size_Up):
-                if not self.tux_size:
-                    c_event = Event.GROW
-                else:
-                    c_event = Event.SHRINK
 
         self.fsm_main.update(c_event, self)
         return None
@@ -320,7 +315,7 @@ class Tux(Agent, Subject):
             self.notify(CATCH_COIN)
 
         # See tux hit anything (platforms)
-        idle, n_coins = super().collisions()
+        idle, n_coins, n_eggs = super().collisions()
         for _ in range(0, n_coins):
             self.notify(CATCH_COIN)
             

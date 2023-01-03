@@ -4,18 +4,20 @@ from PIL import Image
 from tiles import Tiles
 from goal import Goal, Home
 from coin import Coin
-from bonus_block import EggBlock, CoinBlock
+from bonus_block import EggBlock, CoinBlock, Egg
 
 class Level():
 
-    def __init__(self, filename, scale=20) -> None:
+    def __init__(self, filename, height, scale=20) -> None:
         self.filename = filename
         self.scale = scale
+        self.height = height
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
         self.goal_list = pygame.sprite.Group()
         self.coin_list = pygame.sprite.Group()
         self.blocks_list = pygame.sprite.Group()
+        self.powers = pygame.sprite.Group()
         self.level_limit = -1000
         self.player_start_position = (0, 0)
 
@@ -63,7 +65,11 @@ class Level():
                 elif hex_code == Tiles.COIN_BLOCK.value:
                     bonus_blocks.append(CoinBlock(x*self.scale, y*self.scale))
                 elif hex_code == Tiles.EGG_BLOCK.value:
-                    bonus_blocks.append(EggBlock(x*self.scale, y*self.scale))
+                    egg = Egg(x*self.scale, y*self.scale, self.height*self.scale)
+                    egg_block = EggBlock(x*self.scale, y*self.scale, egg)
+                    bonus_blocks.append(egg_block)
+                    self.powers.add(egg_block.egg)
+                    
 
         def _get_platform_details(group):
             x, y = min(group)
@@ -108,6 +114,10 @@ class Level():
             self.platform_list.add(block)
         _define_flying_platforms(flying_platforms, flying_platforms_limits)
 
+        #egg needs to know where the platforms are to detect collisions
+        for egg in self.powers:
+            egg.set_platforms(self.platform_list)
+
     def update(self):
         """ Update everything in this level."""
         self.coin_list.update()
@@ -115,6 +125,7 @@ class Level():
         self.enemy_list.update()
         self.goal_list.update()
         self.blocks_list.update()
+        self.powers.update()
         
  
     def draw(self, screen):
@@ -124,6 +135,7 @@ class Level():
         self.enemy_list.draw(screen)
         self.goal_list.draw(screen)
         self.blocks_list.draw(screen)
+        self.powers.draw(screen)
         
  
     def shift_world(self, shift_x):
@@ -147,4 +159,7 @@ class Level():
             coin.rect.x += shift_x
 
         for block in self.blocks_list:
+            block.rect.x += shift_x
+
+        for block in self.powers:
             block.rect.x += shift_x
