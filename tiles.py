@@ -13,5 +13,5 @@ class Tiles(Enum):
     FLYING_PLATFORM_LIMIT = "ffcc80"
     FLYING_PLATFORM = "ff9800"
     COIN = "ffff00"
-    COIN_BLOCK = "4caf50"
+    COIN_BLOCK = "d500f9"
     EGG_BLOCK = "3f51b5"
