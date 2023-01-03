@@ -33,7 +33,7 @@ class Platform(pygame.sprite.Sprite):
         y_cursor = 0
 
         while ( y_cursor < self.height ):
-            if y_cursor == 0: #snow
+            if y_cursor == 0: #top
                 self.image.blit( self.top_left_sheet, ( 0, y_cursor ) )
             else: #wall tile
                 self.image.blit( self.bottom_left_sheet, ( 0, y_cursor ) )
@@ -43,7 +43,7 @@ class Platform(pygame.sprite.Sprite):
         x_cursor = self.bottom_left_sheet.get_width()
         while ( y_cursor < self.height ):
             while ( x_cursor < self.width-self.top_right_sheet.get_width() ):
-                if y_cursor == 0: #snow
+                if y_cursor == 0: #top
                     self.image.blit( self.top_sheet, ( x_cursor, y_cursor ) )
                 else: #wall tile
                     self.image.blit( self.bottom_sheet, ( x_cursor, y_cursor ) )
@@ -54,7 +54,7 @@ class Platform(pygame.sprite.Sprite):
         y_cursor = 0
         x_cursor = self.width-self.bottom_right_sheet.get_width()
         while ( y_cursor < self.height ):
-            if y_cursor == 0: #snow
+            if y_cursor == 0: #top
                 self.image.blit( self.top_right_sheet, ( x_cursor, y_cursor ) )
             else: #wall tile
                 self.image.blit( self.bottom_right_sheet, ( x_cursor, y_cursor ) )

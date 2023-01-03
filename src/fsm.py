@@ -7,7 +7,7 @@ class State:
     def enter(self):
         pass
 
-    def update(self, previous):
+    def update(self):
         pass
 
     def exit(self):
@@ -30,18 +30,16 @@ class FSM:
         return self.current
 
     def update(self, event, object, dir=Directions.RIGHT):
-        prev = None
         if event:
             if self._transitions.get(event)==None:
                 print(self._transitions)
             for trans in self._transitions.get(event):
                 if trans._from == self.current:
-                    prev = self.current
                     self.current.exit(object)
                     self.current = trans._to
                     self.current.enter(object)
         
-        self.current.update(self.current,object=object,dir=dir,previous=prev)
+        self.current.update(self.current,object=object,dir=dir)
         
         if self.current == self.end:
             self.current.exit(object)

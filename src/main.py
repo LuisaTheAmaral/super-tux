@@ -1,10 +1,9 @@
 import pygame
-from pygame.locals import *
 import math
-from agent import Agent
+import os
+from pygame.locals import *
 from level import Level 
 from tux import Tux, ENEMY_KILLED, TUX_DEAD
-from monster import Snowball, Spawner
 from scoreboard import Scoreboard
 from common import YELLOW, BLACK
  
@@ -29,10 +28,13 @@ def main(width, height, scale):
     pygame.display.set_caption("Tux")
  
     # Create all the levels
+    levels_folder_path = "assets/levels/"
     level_list = []
-    level_list.append(Level("assets/levels/level1.png", height=height, scale=scale))
-    level_list.append(Level("assets/levels/level2.png", height=height, scale=scale))
-    level_list.append(Level("assets/levels/level3.png", height=height, scale=scale))
+    level_files = os.listdir(levels_folder_path)
+    level_files.sort()
+    for level in level_files:
+        if level.endswith(".png"):
+            level_list.append(Level(f"{levels_folder_path}/{level}", height=height, scale=scale))
  
     # Set the current level
     current_level_no = 0
@@ -51,35 +53,34 @@ def main(width, height, scale):
     active_sprite_list.add(player)
     active_sprite_list.add(scoreboard)
  
-    # Loop until the user clicks the close button.
+    # flag to control game loop
     done = False
  
-    # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
     
-    dead_event=0
-    # -------- Main Program Loop -----------
     while not done:
         # fill background with image
         for i in range( 0, tiles):
             screen.blit(bg, (i*bg_width+scroll,0))
 
         for event in pygame.event.get():
-            # if tux is dead end game
+            # if tux is dead then end game
             if event.type == pygame.QUIT or event.type == TUX_DEAD:
                 done = True
               
             # enemy has been killed  
             if event.type == ENEMY_KILLED:
-                tmp_enemy = event.__dict__["enemy"]
-                current_level.kill_enemy(tmp_enemy)
+                event_enemy = event.__dict__["enemy"]
+                current_level.kill_enemy(event_enemy)
                     
+            # user presses a key
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE):
                     cmd = player.commands(event.key)
                     if cmd:
                         command_log.append(cmd)
- 
+            
+            # when key is released tux stops walking
             if event.type == pygame.KEYUP:
                 if (event.key == pygame.K_LEFT and player.change_x < 0) or (event.key == pygame.K_RIGHT and player.change_x > 0):
                     cmd = player.commands(None)
@@ -107,14 +108,14 @@ def main(width, height, scale):
             player.rect.left = 120
             current_level.shift_world(diff)   
 
-        # If the player gets to the end of the level, go to the next level
+        # If player collides with egg power, player should grow
         block_hit_list = pygame.sprite.spritecollide(player, current_level.powers, False)
         for power in block_hit_list:
             power.deactivate()
             current_level.powers.remove(power)
             player.grow_toggle()  
  
-        # If the player gets to the end of the level, go to the next level
+        # If the player gets to the goal of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
         if block_hit_list:
             msg = f"LEVEL {current_level_no+1} COMPLETED. PRESS ENTER TO CONTINUE"
@@ -155,18 +156,15 @@ def main(width, height, scale):
                         if event.key == pygame.K_RETURN:
                             next_level = True
                             break
-                
-        # current_position = player.rect.x + current_level.world_shift
-        # if current_position < current_level.level_limit:
-        #     player.rect.x = 120
+            # prepare next level
             if current_level_no < len(level_list)-1:
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
-                # snowball.level = current_level
                 x, y = current_level.player_start_position
                 player.set_start_position(x, y)
  
+        # if the game still goes on then draw the sprites
         if not done:
             current_level.draw(screen)
             active_sprite_list.draw(screen)
@@ -175,7 +173,6 @@ def main(width, height, scale):
         clock.tick(50)
         for cmd in command_log:
             print(cmd)
-            # command_log.remove(cmd) #reduces cmd print spam
  
         # update the screen
         pygame.display.flip()

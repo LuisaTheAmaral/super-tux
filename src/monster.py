@@ -1,9 +1,9 @@
+import pygame 
 from agent import Agent
 from spritesheet import SpriteSheet
 from enum import Enum
 from fsm import State,Transition,FSM
-from common import Directions, Up, Left, Right, ALPHA
-import pygame 
+from common import Directions, ALPHA
 
 # ENEMY STATES  
 class Event(Enum):
@@ -17,7 +17,7 @@ class Idle(State):
         super().__init__(self.__class__.__name__)
 
     # stop enemy
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         object.stop()
         
     # getting idle sprite
@@ -45,7 +45,7 @@ class Walk(State):
         super().__init__(self.__class__.__name__)
 
     # move enemy
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         if dir==Directions.LEFT:
             object.move(Directions.LEFT, change_x = 1)
         else:
@@ -70,7 +70,7 @@ class Die(State):
         super().__init__(self.__class__.__name__)
 
     # kill enemy
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         if object.dead:
             return
         object.kill()
@@ -88,8 +88,7 @@ STATES = [Idle, Walk, Die]
 
 TRANSITIONS = {
     Event.IDLE: [
-        Transition(Walk, Idle),
-        Transition(Die, Idle)],
+        Transition(Walk, Idle)],
     Event.WALK: [Transition(Idle, Walk)],
     Event.DIE: [
         Transition(Idle, Die),
@@ -106,7 +105,7 @@ class Enemy(Agent):
         self.name = name
         self.direction_auto = self.direction
         
-        # state machine responsible for tux in big or mini
+        # state machine responsible for tux in big fsm or mini fsm
         self.fsm = FSM(STATES, TRANSITIONS)
         
     def clone(self):
@@ -116,8 +115,8 @@ class Enemy(Agent):
         return 1
         
     # move enemy automatically
-    def commands(self, dead=0):
-        if dead:
+    def commands(self, is_dead):
+        if is_dead:
             self.fsm.update(Event.DIE, self)
         else:
             self.fsm.update(Event.WALK, self, dir=self.direction) 
@@ -128,7 +127,7 @@ class Enemy(Agent):
         # See if we hit anything
         idle, _, _ = super().collisions()
         
-        #making sure that monsyter changes to idle when he lands on the ground and does not move
+        #making sure that monster changes to idle when he lands on the ground and does not move
         if idle:
             self.fsm.update(Event.IDLE, self)
                 
@@ -153,8 +152,6 @@ class Enemy(Agent):
         elif isinstance(current_state, Die):
             #enemy is dead
             frameX, frameY= current_state.get_xy(dir=self.direction)
-        else:
-            print("ERROR")
             
         super().update(x,y,frameX,frameY,cell_size=(self.cellsize,self.cellsize))
         

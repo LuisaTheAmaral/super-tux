@@ -20,7 +20,7 @@ class Goal(pygame.sprite.Sprite):
         self.bottom_sheet = SpriteSheet("assets/goal/goal1-4.png").sheet
         self.image.blit( self.top_sheet, ( 0, 0 ) )
         
-        for i in range(32, GOAL_HEIGHT+1, 32):
+        for i in range(GOAL_WIDTH, GOAL_HEIGHT+1, GOAL_WIDTH):
             self.image.blit( self.bottom_sheet, ( 0, i ) )
 
         self.rect = self.image.get_rect()

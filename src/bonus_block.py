@@ -1,7 +1,9 @@
 import pygame
 from spritesheet import SpriteSheet
-from common import ALPHA
-from common import Directions, ALPHA
+from common import ALPHA, Directions
+
+# Global constants
+CELL_SIZE = 32
 
 class BonusBlock(pygame.sprite.Sprite):
     def __init__(self, x, y) -> None:
@@ -9,7 +11,7 @@ class BonusBlock(pygame.sprite.Sprite):
         self.sprites = [f"assets/bonus_block/full-{i}.png" for i in range (0,5)]
         self.empty_sheet = SpriteSheet("assets/bonus_block/empty.png").sheet
         self.sheet_pointer = 0
-        self.image = pygame.Surface([32, 32], pygame.SRCALPHA)
+        self.image = pygame.Surface([CELL_SIZE, CELL_SIZE], pygame.SRCALPHA)
         self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
         
         self.sheet = SpriteSheet(self.sprites[self.sheet_pointer]).sheet
@@ -59,17 +61,16 @@ class Egg(pygame.sprite.Sprite):
     def __init__(self, x, y, height) -> None:
         super().__init__()
         self.sheet = SpriteSheet("assets/bonus_block/egg.png").sheet
-        self.image = pygame.Surface([32, 32], pygame.SRCALPHA)
+        self.image = pygame.Surface([CELL_SIZE, CELL_SIZE], pygame.SRCALPHA)
         self.image.set_colorkey(ALPHA, pygame.RLEACCEL)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y-32)
+        self.rect.center = (x, y - CELL_SIZE)
         
-        self.show_egg = False
-         
         self.change_x = 0
         self.change_y = 0
         self.height = height
         
+        self.show_egg = False
         self.platforms = None
 
     def calc_grav(self):
@@ -88,7 +89,6 @@ class Egg(pygame.sprite.Sprite):
         self.image.set_colorkey("white")
         if self.show_egg:
             self.calc_grav()
-            
             self.collisions()
             self.image.blit( self.sheet, ( 0, 0 ) )
 

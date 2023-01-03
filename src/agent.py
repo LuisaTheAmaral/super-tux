@@ -2,7 +2,6 @@ import pygame
 from spritesheet import SpriteSheet
 from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
 import logging
-from enum import Enum
 from bonus_block import CoinBlock, EggBlock
 from platforms import FlyingPlatform
 
@@ -32,6 +31,7 @@ class Agent(pygame.sprite.Sprite):
         self.level = None
 
     def set_start_position(self, x, y):
+        self.change_x, self.change_y = 0,0
         self.rect.x, self.rect.y = x*self.scale, y*self.scale
 
     def controls(self, up, left, down, right, grow):
@@ -54,11 +54,9 @@ class Agent(pygame.sprite.Sprite):
             self.change_y = 0
             self.rect.y = self.HEIGHT - self.rect.height
  
-    def jump(self, previous):
+    def jump(self):
         """ Called when user hits 'jump' button. """
-        # move down a bit and see if there is a platform below us.
-        # Move down 2 pixels because it doesn't work well if we only move down 1
-        # when working with a platform moving down.
+        # Move down 2 pixels to see if there is a platform bellow us
         self.rect.y += 2
         platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         self.rect.y -= 2
@@ -98,8 +96,7 @@ class Agent(pygame.sprite.Sprite):
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
             if not isinstance(block,FlyingPlatform):
-            # If we are moving right,
-            # set our right side to the left side of the item we hit
+            # If moving right, set right side to the left side of the item we hit
                 if self.change_x > 0:
                     self.rect.right = block.rect.left
                     self.direction_auto = Directions.LEFT
@@ -128,10 +125,12 @@ class Agent(pygame.sprite.Sprite):
                 self.rect.bottom = block.rect.top
             elif self.change_y < 0:
                 self.rect.top = block.rect.bottom
+                #if tux hits a coin block break it
                 if isinstance(block, CoinBlock):
                     box_broken = block.break_block()
                     if box_broken:
                         n_coins_hit += 1
+                #if tux hits a power block break it
                 elif isinstance(block, EggBlock):
                     box_broken = block.break_block()
                     if box_broken:

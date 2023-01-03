@@ -1,7 +1,6 @@
 import pygame 
 from spritesheet import SpriteSheet
-from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA, ENEMY_KILLED, TUX_DEAD, CATCH_COIN, Subject
-import logging
+from common import Directions, Up, Left, Right, ALPHA, ENEMY_KILLED, TUX_DEAD, CATCH_COIN, Subject
 from fsm import FSM, State, Transition
 from enum import Enum
 from agent import Agent
@@ -28,7 +27,7 @@ class Idle(State):
         super().__init__(self.__class__.__name__)
 
     # stop tux
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         object.stop()
         
     # getting idle coords
@@ -65,7 +64,7 @@ class Walk(State):
         super().__init__(self.__class__.__name__)
 
     # move tux
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         if dir==Directions.LEFT:
             object.move(Directions.LEFT, change_x = 6)
         else:
@@ -86,8 +85,8 @@ class Jump(State):
         super().__init__(self.__class__.__name__)
 
     # make tux jump
-    def update(self, object, dir, previous):
-        object.jump(previous)
+    def update(self, object, dir):
+        object.jump()
         
     # getting jumping sprite
     def get_xy(self, dir):
@@ -103,7 +102,7 @@ class Grow(State):
         super().__init__(self.__class__.__name__)
 
     # change active state machine to big tux
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         object.grow_toggle()
     
 # | TUX DIE STATE
@@ -115,7 +114,7 @@ class Die(State):
         super().__init__(self.__class__.__name__)
 
     # kill tux
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         return object.kill()
     
     # getting dead sprite
@@ -128,7 +127,7 @@ class Shrink(State):
         super().__init__(self.__class__.__name__)
 
     # change active state machine to mini tux
-    def update(self, object, dir, previous):
+    def update(self, object, dir):
         object.grow_toggle()
         
 
@@ -272,8 +271,6 @@ class Tux(Agent, Subject):
         elif isinstance(current_state, Die):
             #tux is dead
             frameX, frameY = current_state.get_xy()
-        else:
-            print("ERROR")
           
         super().update(x,y,frameX,frameY,cell_size=self.cellsize)
         
@@ -312,19 +309,15 @@ class Tux(Agent, Subject):
             self.level.coin_list.remove(coin)
             self.notify(CATCH_COIN)
             
-            
         # See tux hit anything (platforms)
         idle, n_coins, n_eggs = super().collisions()
         for _ in range(0, n_coins):
             self.notify(CATCH_COIN)
-            
-        
 
         #making sure that tux changes to idle when he lands on the ground and does not move
         if idle:
             self.fsm_main.update(Event.IDLE, self)
                 
-    
     def been_hit(self):
         """ Tux has been hit. """
         if not self.tux_size:

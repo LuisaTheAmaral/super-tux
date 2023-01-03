@@ -2,6 +2,7 @@ import pygame
 from spritesheet import SpriteSheet
 from common import CATCH_COIN, ENEMY_KILLED, YELLOW, BLACK
 
+TEXT_HEIGHT = 15
 class Scoreboard(pygame.sprite.Sprite):
 
     def __init__(self, screen_width, player):
@@ -31,15 +32,15 @@ class Scoreboard(pygame.sprite.Sprite):
         
         #blit icon of score
         sheet = SpriteSheet(img).sheet
-        scaled = pygame.transform.scale(sheet, (15, 15))
+        scaled = pygame.transform.scale(sheet, (TEXT_HEIGHT, TEXT_HEIGHT))
         self.image.blit(scaled, (0, y))
 
         #blit score
         msg = f'x {score}'
         text = self.font.render(msg, True, YELLOW)
         shadow = self.font.render(msg, True, BLACK)
-        self.image.blit(shadow, (20+self.shadow_offset, y + self.shadow_offset))
-        self.image.blit(text, (20, y))
+        self.image.blit(shadow, ((TEXT_HEIGHT + 5) + self.shadow_offset, y + self.shadow_offset))
+        self.image.blit(text, ((TEXT_HEIGHT + 5), y))
 
     def update(self):
         self.image.fill("blue")

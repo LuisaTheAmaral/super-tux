@@ -1,6 +1,5 @@
 import pygame
 from enum import Enum
-from datetime import datetime
 
 CATCH_COIN = pygame.event.custom_type()
 ENEMY_KILLED = pygame.event.custom_type()

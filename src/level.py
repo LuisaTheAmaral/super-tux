@@ -13,20 +13,21 @@ class Level():
         self.filename = filename
         self.scale = scale
         self.height = height
+        
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
         self.goal_list = pygame.sprite.Group()
         self.coin_list = pygame.sprite.Group()
         self.blocks_list = pygame.sprite.Group()
         self.powers = pygame.sprite.Group()
-        self.level_limit = -1000
+        
         self.player_start_position = (0, 0)
 
         # How far this world has been scrolled left/right
         self.world_shift = 0
         self.coords = []
 
-        self.parse_level_file()
+        self.parse_level_file() #obtain level details from level byte map
         
     def add_enemy(self, enemy):
         self.enemy_list.add(enemy)
@@ -148,14 +149,11 @@ class Level():
     def send_enemy_commands(self):
         """ Send command to all enemies."""
         for enemy in self.enemy_list:
-            if not enemy.dead:
-                enemy.commands(0)
-            else:
-                enemy.commands(1)
+            enemy.commands(enemy.dead)
             
     def kill_enemy(self, enemy):
         """ Kill enemy."""
-        enemy.commands(1)
+        enemy.commands(True)
  
     def draw(self, screen):
         """ Draw everything on this level. """ 
