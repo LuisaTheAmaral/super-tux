@@ -1,6 +1,6 @@
 # super-tux
 
-A simple recreation of the Super Tux game using pygame
+A simple recreation of the Super Tux game using pygame. Developed with [Maria](https://github.com/MariaStrecht)
 
 ![Super tux](https://github.com/LuisaTheAmaral/super-tux/blob/main/game_screenshot.png?raw=true)
 
