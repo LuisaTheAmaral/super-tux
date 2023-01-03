@@ -5,18 +5,18 @@ from fsm import State,Transition,FSM
 from common import Directions, Up, Left, Right, ALPHA
 import pygame 
 
-# MONSTER STATES  
+# ENEMY STATES  
 class Event(Enum):
     IDLE = 1,
     WALK = 2,
     DIE = 3
 
-# | MONSTER IDLE STATE
+# | ENEMY IDLE STATE
 class Idle(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # stop monster
+    # stop enemy
     def update(self, object, dir, previous):
         object.stop()
         
@@ -29,7 +29,7 @@ class Idle(State):
             frameX, frameY = (1, 1)
         return frameX, frameY, walking_pointer
     
-# | MONSTER WALK STATE
+# | ENEMY WALK STATE
 class Walk(State):
     # walking sprite coords
     WALKING =   [(0, 1), #walk-0
@@ -44,7 +44,7 @@ class Walk(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # move monster
+    # move enemy
     def update(self, object, dir, previous):
         if dir==Directions.LEFT:
             object.move(Directions.LEFT, change_x = 1)
@@ -60,7 +60,7 @@ class Walk(State):
         walking_pointer = (walking_pointer + 0.2) % len(self.WALKING)
         return frameX, frameY, walking_pointer
     
-# | MONSTER DIE STATE
+# | ENEMY DIE STATE
 class Die(State):
     # dead sprite coords
     DEAD = (3,0)
@@ -69,7 +69,7 @@ class Die(State):
     def __init__(self) -> None:
         super().__init__(self.__class__.__name__)
 
-    # kill monster
+    # kill enemy
     def update(self, object, dir, previous):
         if object.dead:
             return
@@ -97,15 +97,23 @@ TRANSITIONS = {
     ]
 }
 
-class Monster(Agent):
-    def __init__(self, name, width, height, scale) -> None:
-        super().__init__(name, width, height, scale)
+class Enemy(Agent):
+    def __init__(self, name, width, height, scale, direction) -> None:
+        super().__init__(name, width, height, scale, direction)
+        self.width = width
+        self.height = height
+        self.scale = scale
         self.name = name
-        self.direction = Directions.LEFT
-        self.direction_auto = Directions.LEFT
+        self.direction_auto = self.direction
         
         # state machine responsible for tux in big or mini
         self.fsm = FSM(STATES, TRANSITIONS)
+        
+    def clone(self):
+        return NotImplemented
+    
+    def is_smashable(self):
+        return 1
         
     # move enemy automatically
     def commands(self, dead=0):
@@ -137,13 +145,13 @@ class Monster(Agent):
             self.direction = self.direction_auto
   
         if isinstance(current_state, Walk):
-            #monster is walking
+            #enemy is walking
             frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
         elif isinstance(current_state, Idle):
-            #monster is idle
+            #enemy is idle
             frameX, frameY, self.walking_pointer = current_state.get_xy(self.direction, self.walking_pointer)
         elif isinstance(current_state, Die):
-            #monster is dead
+            #enemy is dead
             frameX, frameY= current_state.get_xy(dir=self.direction)
         else:
             print("ERROR")
@@ -151,16 +159,46 @@ class Monster(Agent):
         super().update(x,y,frameX,frameY,cell_size=(self.cellsize,self.cellsize))
         
     
-class Snowball(Monster):
-    def __init__(self, initial_x, initial_y, width, height, scale) -> None:
-        super().__init__("snowball", width, height, scale)
+class Snowball(Enemy):
+    def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
+        super().__init__("snowball", width, height, scale, direction)
         # load snowball spritesheet
-        self.sheet = SpriteSheet("sprites/spritesheet_enemy.png")
+        self.sheet = SpriteSheet("sprites/spritesheet_snowball.png")
         self.cellsize = 50
         frameX, frameY = (1, 0)
         self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
         self.rect = self.image.get_rect()
         
         self.set_start_position(initial_x, initial_y) #set player initial  position 
+        
+    def clone(self, initial_x, initial_y, direction) -> Enemy:
+        return Snowball(initial_x, initial_y, self.width, self.height, self.scale, direction)
+    
+    def is_smashable(self):
+        return 1
+    
+class Spiky(Enemy):
+    def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
+        super().__init__("snowball", width, height, scale, direction)
+        # load snowball spritesheet
+        self.sheet = SpriteSheet("sprites/spritesheet_spiky.png")
+        self.cellsize = 50
+        frameX, frameY = (1, 0)
+        self.image = self.sheet.image_at((frameX * self.cellsize, frameY * self.cellsize, self.cellsize, self.cellsize), colorkey=ALPHA)
+        self.rect = self.image.get_rect()
+        
+        self.set_start_position(initial_x, initial_y) #set player initial  position 
+        
+    def clone(self, initial_x, initial_y, direction) -> Enemy:
+        return Spiky(initial_x, initial_y, self.width, self.height, self.scale, direction)
+    
+    def is_smashable(self):
+        return 0
+ 
+class Spawner:
+    def spawn_enemy(self, prototype, initial_x, initial_y, is_right=0) -> Enemy:
+        if is_right:
+            return prototype.clone(initial_x, initial_y, Directions.RIGHT)
+        return prototype.clone(initial_x, initial_y, Directions.LEFT)
         
  

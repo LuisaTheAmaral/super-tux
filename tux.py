@@ -169,7 +169,7 @@ TRANSITIONS_BIG = {
 
 class Tux(Agent, Subject):
     def __init__(self, name, initial_x, initial_y, width, height, scale):
-        Agent.__init__(self, name, width, height, scale)
+        Agent.__init__(self, name, width, height, scale, Directions.RIGHT)
         Subject.__init__(self)
         # load mini tux sheet
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
@@ -282,7 +282,6 @@ class Tux(Agent, Subject):
     
     def collisions(self):
         """ Verify collisions of tux with platforms and enemies. """
-        
         # kill tux if he is on the bottom of the screen
         if not self.tux_size and self.rect.y == 550:
             self.fsm_main.update(Event.DIE, self)
@@ -293,27 +292,23 @@ class Tux(Agent, Subject):
         
         # verify if tux has colided with any enemy
         block_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
-        
-        for enemy in self.level.enemy_list:
-            if not enemy.dead:
-                for block in block_hit_list:
-                    if self.change_x < 10 and self.change_y > 0:
-                        if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
-                            # tux has been hit
-                            self.been_hit()
-                        else:
-                            # enemy has been killed - notify enemy
-                            ev = pygame.event.Event(ENEMY_KILLED)
-                            self.notify(ENEMY_KILLED)
-                            pygame.event.post(ev)
-                break
+        for block in block_hit_list:
+            if not block.dead and self.change_x < 10 and self.change_y > 0:
+                if (self.change_y==1 and self.tux_size) or (self.change_y<2 and not self.tux_size):
+                    # tux has been hit
+                    self.been_hit()
+                elif block.is_smashable():
+                    # enemy has been killed - notify enemy
+                    ev = pygame.event.Event(ENEMY_KILLED, {"enemy": block})
+                    pygame.event.post(ev)
 
         # If the player collides with a coin it has to disappear and the scoreboard needs to be updated
         coin_hit_list = pygame.sprite.spritecollide(self, self.level.coin_list, False)
         for coin in coin_hit_list:
             self.level.coin_list.remove(coin)
             self.notify(CATCH_COIN)
-
+            
+            
         # See tux hit anything (platforms)
         idle, n_coins, n_eggs = super().collisions()
         for _ in range(0, n_coins):
@@ -329,6 +324,7 @@ class Tux(Agent, Subject):
     def been_hit(self):
         """ Tux has been hit. """
         if not self.tux_size:
+            print("TUX is dead")
             self.fsm_main.update(Event.DIE, self)
         else:
             self.fsm_main.update(Event.SHRINK, self)

@@ -4,12 +4,13 @@ from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
 import logging
 from enum import Enum
 from bonus_block import CoinBlock, EggBlock
+from platforms import FlyingPlatform
 
 # Global constants
 CELL_SIZE = 50
 
 class Agent(pygame.sprite.Sprite):
-    def __init__(self, name, width, height, scale):
+    def __init__(self, name, width, height, scale, direction):
         super().__init__()
         self.name = name
         self.sheet = SpriteSheet("sprites/spritesheet_full.png")
@@ -18,7 +19,7 @@ class Agent(pygame.sprite.Sprite):
         self.dead = False
 
         self.walking_pointer = 0
-        self.direction = Directions.LEFT
+        self.direction = direction
 
         self.HEIGHT = height*self.scale
         self.WIDTH = width*self.scale
@@ -96,16 +97,17 @@ class Agent(pygame.sprite.Sprite):
         n_eggs_hit = 0
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
+            if not isinstance(block,FlyingPlatform):
             # If we are moving right,
             # set our right side to the left side of the item we hit
-            if self.change_x > 0:
-                self.rect.right = block.rect.left
-                self.direction_auto = Directions.LEFT
-                    
-            elif self.change_x < 0:
-                # Otherwise if we are moving left, do the opposite
-                self.rect.left = block.rect.right
-                self.direction_auto = Directions.RIGHT
+                if self.change_x > 0:
+                    self.rect.right = block.rect.left
+                    self.direction_auto = Directions.LEFT
+                        
+                elif self.change_x < 0:
+                    # Otherwise if we are moving left, do the opposite
+                    self.rect.left = block.rect.right
+                    self.direction_auto = Directions.RIGHT
  
         # Move up/down
         self.rect.y += self.change_y
