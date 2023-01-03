@@ -127,7 +127,9 @@ def main(width, height, scale):
             player.stop()
 
             #show continue screen
-            pygame.display.flip()
+            screen.fill("white")
+            for i in range( 0, tiles):
+                screen.blit(bg, (i*bg_width+scroll,0))
             
             font = pygame.font.Font('assets/SuperTux-Medium.ttf', 32)
             shadow_offset = 2
@@ -169,7 +171,7 @@ def main(width, height, scale):
             current_level.draw(screen)
             active_sprite_list.draw(screen)
  
-        # Limit to 60 frames per second
+        # Limit to 50 frames per second
         clock.tick(50)
         for cmd in command_log:
             print(cmd)
