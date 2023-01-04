@@ -116,7 +116,7 @@ def main(width, height, scale):
         for power in block_hit_list:
             power.deactivate()
             current_level.powers.remove(power)
-            player.grow_toggle()  
+            player.grow_toggle(True)  
  
         # If the player gets to the goal of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
