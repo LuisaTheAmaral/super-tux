@@ -158,7 +158,7 @@ class Enemy(Agent):
     
 class Snowball(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
-        super().__init__("snowball", width, height, scale, direction)
+        super().__init__("Snowball", width, height, scale, direction)
         # load snowball spritesheet
         self.sheet = SpriteSheet("assets/creatures/spritesheet_snowball.png")
         self.cellsize = 50
@@ -176,7 +176,7 @@ class Snowball(Enemy):
     
 class Spiky(Enemy):
     def __init__(self, initial_x, initial_y, width, height, scale, direction=Directions.LEFT) -> None:
-        super().__init__("snowball", width, height, scale, direction)
+        super().__init__("Spiky", width, height, scale, direction)
         # load snowball spritesheet
         self.sheet = SpriteSheet("assets/creatures/spritesheet_spiky.png")
         self.cellsize = 50

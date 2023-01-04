@@ -194,11 +194,11 @@ class Tux(Agent, Subject):
         # main state machine
         self.fsm_main = self.fsm_mini
         
-    def grow_toggle(self):
+    def grow_toggle(self, ball=False):
         """ Changes tux size. """
         
         tmp = self.rect
-        if not self.tux_size:
+        if ball:
             # if tux is mini change to big tux
             self.fsm_main = self.fsm_max
             self.sheet = SpriteSheet("assets/creatures/spritesheet_big_full.png")
@@ -321,7 +321,6 @@ class Tux(Agent, Subject):
     def been_hit(self):
         """ Tux has been hit. """
         if not self.tux_size:
-            print("TUX is dead")
             self.fsm_main.update(Event.DIE, self)
         else:
             self.fsm_main.update(Event.SHRINK, self)

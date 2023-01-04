@@ -1,6 +1,6 @@
 import pygame 
 from spritesheet import SpriteSheet
-from common import Directions, Up, Left, Down, Right, Size_Up, ALPHA
+from common import Directions, Up, Left, Right, ALPHA
 import logging
 from bonus_block import CoinBlock, EggBlock
 from platforms import FlyingPlatform
@@ -38,9 +38,7 @@ class Agent(pygame.sprite.Sprite):
         self.control_keys = {
             up: Up, 
             left: Left, 
-            down: Down, 
-            right: Right, 
-            grow: Size_Up}
+            right: Right}
  
     def calc_grav(self):
         """ Calculate effect of gravity. """

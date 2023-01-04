@@ -6,7 +6,8 @@ from level import Level
 from tux import Tux, ENEMY_KILLED, TUX_DEAD
 from scoreboard import Scoreboard
 from common import YELLOW, BLACK
- 
+from datetime import datetime
+
 def main(width, height, scale):
     """ Main Program """
     pygame.init()
@@ -66,12 +67,14 @@ def main(width, height, scale):
         for event in pygame.event.get():
             # if tux is dead then end game
             if event.type == pygame.QUIT or event.type == TUX_DEAD:
+                command_log.append(f"[{datetime.now()}] {player.name}: IS DEAD")
                 done = True
               
             # enemy has been killed  
             if event.type == ENEMY_KILLED:
                 event_enemy = event.__dict__["enemy"]
                 current_level.kill_enemy(event_enemy)
+                command_log.append(f"[{datetime.now()}] {event_enemy.name}: IS DEAD")
                     
             # user presses a key
             if event.type == pygame.KEYDOWN:
@@ -103,9 +106,9 @@ def main(width, height, scale):
             current_level.shift_world(-diff)
  
         # If the player gets near the left side, shift the world right (+x)
-        if player.rect.left <= 120:
-            diff = 120 - player.rect.left
-            player.rect.left = 120
+        if player.rect.left <= 300:
+            diff = 300 - player.rect.left
+            player.rect.left = 300
             current_level.shift_world(diff)   
 
         # If player collides with egg power, player should grow
@@ -113,7 +116,7 @@ def main(width, height, scale):
         for power in block_hit_list:
             power.deactivate()
             current_level.powers.remove(power)
-            player.grow_toggle()  
+            player.grow_toggle(True)  
  
         # If the player gets to the goal of the level, go to the next level
         block_hit_list = pygame.sprite.spritecollide(player, current_level.goal_list, False)
@@ -173,6 +176,7 @@ def main(width, height, scale):
         clock.tick(50)
         for cmd in command_log:
             print(cmd)
+            command_log.remove(cmd)
  
         # update the screen
         pygame.display.flip()
